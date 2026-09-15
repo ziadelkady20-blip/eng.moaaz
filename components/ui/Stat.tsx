@@ -1,1 +1,0 @@
-export default function Stat({label,value}:{label:string,value:string}){return <div className="card p-5"><div className="text-3xl font-black">{value}</div><div className="muted mt-1">{label}</div></div>}
