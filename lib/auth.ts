@@ -4,7 +4,11 @@ import { db } from './db'
 import type { Role } from '@prisma/client'
 
 const COOKIE = 'taallum_session'
-const SECRET = process.env.AUTH_SECRET || (process.env.NODE_ENV === 'production' ? (()=>{ throw new Error('AUTH_SECRET is required in production') })() : 'dev-only-secret-change-me')
+const SECRET = process.env.AUTH_SECRET || (
+  process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE !== 'phase-production-build'
+    ? (()=>{ throw new Error('AUTH_SECRET is required in production') })()
+    : 'dev-only-secret-change-me'
+)
 const TTL = 60 * 60 * 24 * 30
 
 export function hashPassword(password: string) {
