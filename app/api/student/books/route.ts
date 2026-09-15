@@ -1,2 +1,0 @@
-import {NextResponse} from 'next/server'; import {db} from '@/lib/db'; import {requireRole} from '@/lib/auth';
-export async function GET(){try{const u=await requireRole(['STUDENT']); if(!u.student)return NextResponse.json({error:'غير مصرح'},{status:401}); const books=await db.book.findMany({where:{gradeId:u.student.gradeId??undefined},include:{subject:true,grade:true}}); return NextResponse.json({books})}catch{return NextResponse.json({error:'تعذر تحميل الكتب'},{status:400})}}

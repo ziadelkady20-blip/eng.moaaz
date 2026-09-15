@@ -1,2 +1,0 @@
-import {NextResponse} from 'next/server'; import {db} from '@/lib/db'; import {requireRole} from '@/lib/auth'
-export async function GET(){try{await requireRole(['ADMIN']); const orders=await db.order.findMany({include:{student:{include:{user:true}},course:true,payments:{orderBy:{createdAt:'desc'}}},orderBy:{createdAt:'desc'}}); return NextResponse.json({orders})}catch{return NextResponse.json({error:'غير مصرح'},{status:401})}}

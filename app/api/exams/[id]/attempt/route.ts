@@ -1,7 +1,0 @@
-import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { requireRole } from '@/lib/auth'
-import { z } from 'zod'
-const answer=z.object({questionId:z.string(),selectedOptionId:z.string().optional(),answerText:z.string().optional()})
-const payload=z.object({answers:z.array(answer)})
-export async function POST(req:Request,{params}:{params:Promise<{id:string}>}){try{const user=await requireRole(['STUDENT']);if(!user.student)return NextResponse.json({error:'Student profile missing'},{status:400});const {id}=await params;const exam=await db.exam.findUnique({where:{id},include:{questions:{include:{options:true}}}});if(!exam)return NextResponse.json({error:'الامتحان غير موجود'},{status:404});const body=payload.parse(await req.json());let score=0;const result=body.answers.map(a=>{const q=exam.questions.find(x=>x.id===a.questionId);const correct=!!q?.options.find(o=>o.id===a.selectedOptionId&&o.isCorrect);if(correct)score+=q?.points??0;return {questionId:a.questionId,answerText:a.answerText,selectedOptionId:a.selectedOptionId,isCorrect:correct}});const max=exam.questions.reduce((n,q)=>n+q.points,0);const attempt=await db.examAttempt.create({data:{studentId:user.student.id,examId:id,submittedAt:new Date(),score:max?score/max*100:0,answers:{create:result}}});return NextResponse.json({attempt,score,max,percentage:max?Math.round(score/max*100):0})}catch(e){return NextResponse.json({error:e instanceof Error&&e.message==='UNAUTHORIZED'?'غير مصرح':'تعذر تسليم الامتحان'},{status:e instanceof Error&&e.message==='UNAUTHORIZED'?401:400})}}

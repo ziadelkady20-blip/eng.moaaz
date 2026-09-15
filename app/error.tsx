@@ -1,2 +1,0 @@
-'use client'
-export default function Error({reset}:{error:Error&{digest?:string};reset:()=>void}){return <main className="min-h-screen grid place-items-center p-6"><div className="card max-w-lg w-full p-8 text-center"><div className="text-5xl">⚠️</div><h1 className="text-2xl font-black mt-4">حصل خطأ غير متوقع</h1><p className="muted mt-2">حاول مرة أخرى، ولو المشكلة استمرت تواصل مع الدعم.</p><button className="btn btn-primary mt-6" onClick={()=>reset()}>حاول مرة أخرى</button></div></main>}
