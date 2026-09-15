@@ -1,0 +1,2 @@
+import {NextResponse} from 'next/server'; import {db} from '@/lib/db'; import {requireRole} from '@/lib/auth';
+export async function POST(_:Request,{params}:{params:Promise<{id:string}>}){try{const u=await requireRole(['STUDENT']); const {id}=await params; await db.notification.updateMany({where:{id,userId:u.id},data:{readAt:new Date()}}); return NextResponse.json({ok:true})}catch{return NextResponse.json({error:'غير مصرح'},{status:401})}}

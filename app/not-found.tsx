@@ -1,0 +1,2 @@
+import Link from 'next/link'
+export default function NotFound(){return <main className="min-h-screen grid place-items-center p-6"><div className="card p-10 text-center"><div className="text-6xl font-black text-[var(--primary)]">404</div><h1 className="text-2xl font-black mt-3">الصفحة غير موجودة</h1><p className="muted mt-2">الرابط الذي فتحته غير متاح.</p><Link href="/" className="btn btn-primary mt-6">العودة للرئيسية</Link></div></main>}

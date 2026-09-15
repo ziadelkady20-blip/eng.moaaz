@@ -1,0 +1,1 @@
+export default function Loading(){return <main className="min-h-screen grid place-items-center p-6"><div className="card p-8 w-full max-w-md"><div className="skeleton h-6 w-40"/><div className="skeleton h-4 w-full mt-4"/><div className="skeleton h-4 w-3/4 mt-2"/></div></main>}
