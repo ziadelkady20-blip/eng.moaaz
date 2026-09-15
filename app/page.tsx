@@ -82,7 +82,7 @@ export default function Home() {
             </div>
           </div>
           <div className="hero-visual">
-            <img src="/hero.jpeg" alt="برمجها مع معاذ" className="hero-art" />
+            <img src="/hero.png" alt="برمجها مع معاذ" className="hero-art" />
           </div>
         </div>
       </section>
@@ -131,7 +131,7 @@ export default function Home() {
 
       <section className="bottom-cta" id="contact">
         <div className="cta-brand"><div className="brand-lockup"><img src="/logo.jpeg" alt="برمجها مع معاذ" className="brand-logo" /><div className="brand-copy"><strong style={{color:'#fff'}}>برمجها مع معاذ</strong><span style={{color:'#dfd0ed'}}>معًا نحقق نجاحك</span></div></div></div>
-        <div className="cta-copy"><strong>مستقبلك يبدأ بقرار .. ابدأ الآن مع برمجها مع معاذ</strong><span>انضم إلى آلاف الطلاب وابدأ رحلتك نحو التفوق في الثانوية العامة</span></div>
+        <div className="cta-copy"><strong>مستقبلك يبدأ بقرار .. ابدأ الآن مع برمجها معاذ</strong><span>انضم إلى آلاف الطلاب وابدأ رحلتك نحو التفوق في الثانوية العامة</span></div>
         <Link href="/register" className="cta-button">إنشاء حساب الآن <span>←</span></Link>
         <div className="cta-side">مجهودك اليوم..<br /><b>هو مستقبلك غدًا</b></div>
       </section>
