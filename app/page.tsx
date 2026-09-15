@@ -21,7 +21,7 @@ export default function Home() {
       <header className="site-header">
         <div className="site-header-inner">
           <div className="header-brand">
-            <img src="/brand-logo.png" alt="Eng Moaaz Ismail" />
+            <img src="/Logo.jpeg" alt="Eng Moaaz Ismail" />
           </div>
           <nav className="main-nav" aria-label="التنقل الرئيسي">
             <a className="active" href="#home">الرئيسية</a>
@@ -56,7 +56,7 @@ export default function Home() {
             </div>
           </div>
           <div className="hero-visual">
-            <img src="/hero-real.svg" alt="Eng Moaaz Ismail platform" className="hero-art" style={{width:'100%',height:'auto',objectFit:'contain',objectPosition:'center',transform:'none'}} />
+            <img src="/hero.jpeg" alt="Eng Moaaz Ismail" className="hero-art" />
           </div>
         </div>
       </section>
@@ -104,7 +104,7 @@ export default function Home() {
       </section>
 
       <section className="bottom-cta" id="contact">
-        <div className="cta-brand"><img src="/brand-logo.png" alt="Eng Moaaz Ismail" /></div>
+        <div className="cta-brand"><img src="/Logo.jpeg" alt="Eng Moaaz Ismail" /></div>
         <div className="cta-copy"><strong>مستقبلك يبدأ بقرار .. ابدأ الآن مع Eng Moaaz Ismail</strong><span>انضم إلى آلاف الطلاب وابدأ رحلتك نحو التفوق في الثانوية العامة</span></div>
         <Link href="/register" className="cta-button">إنشاء حساب الآن <span>←</span></Link>
         <div className="cta-side">مجهودك اليوم..<br /><b>هو مستقبلك غدًا</b></div>
