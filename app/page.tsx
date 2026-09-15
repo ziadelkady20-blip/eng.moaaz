@@ -1,4 +1,127 @@
-import Link from 'next/link'; import CourseCard from '@/components/ui/CourseCard'; import Stat from '@/components/ui/Stat'
-const grades=[['الصف الأول الثانوي','01'],['الصف الثاني الثانوي','02'],['الصف الثالث الثانوي','03']]
-const features=['متابعة ولي الأمر','امتحانات وتصحيح فوري','واجبات وملاحظات المدرس','متابعة الحضور والتقدم']
-export default function Home(){return <main><header className="bg-white/95 border-b sticky top-0 z-30"><div className="container h-20 flex items-center justify-between"><div className="brand-lockup"><img src="/brand-logo.png" className="brand-logo" alt="شعار Eng Moaaz Ismail"/><div><div className="brand-name">Eng Moaaz Ismail</div><div className="brand-role">المنصة التعليمية • الثانوية العامة</div></div></div><nav className="hidden md:flex gap-7 font-semibold"><a href="#courses">الكورسات</a><a href="#grades">المراحل</a><a href="#features">المميزات</a><a href="#faq">الأسئلة الشائعة</a></nav><div className="flex gap-2"><Link href="/login" className="btn btn-soft">تسجيل الدخول</Link><Link href="/register" className="btn btn-primary">ابدأ الآن</Link></div></div></header><section className="py-20"><div className="container grid lg:grid-cols-2 gap-12 items-center"><div><div className="inline-flex px-4 py-2 rounded-full bg-[var(--primary-soft)] text-[var(--primary-dark)] font-bold mb-5">أولى • تانية • تالتة ثانوي عام</div><h1 className="text-5xl md:text-6xl font-black leading-tight">ذاكر بذكاء، تابع مستواك، ووصل لهدفك مع <span className="text-[var(--primary)]">Eng Moaaz Ismail</span>.</h1><p className="text-xl muted mt-6 leading-9">منصة تعليمية متكاملة تجمع الحصص الأونلاين، متابعة السنتر، الامتحانات والواجبات وتقارير الأداء في مكان واحد — لطلاب الثانوية العامة.</p><div className="flex gap-3 mt-8"><Link href="/register" className="btn btn-primary">ابدأ رحلتك الآن</Link><a href="#grades" className="btn btn-soft">استكشف المنصة</a></div></div><div className="card hero-panel p-6"><div className="flex items-center gap-4"><img src="/brand-logo.png" className="w-28 h-20 object-cover rounded-2xl" alt="شعار المنصة"/><div><div className="text-sm font-bold text-[var(--primary)]">لوحة الطالب</div><div className="text-2xl font-black mt-1">صباح الخير يا أحمد 👋</div></div></div><div className="grid grid-cols-2 gap-3 mt-6"><Stat label="إتمام الكورسات" value="68%"/><Stat label="متوسط الدرجات" value="87%"/></div><div className="card p-5 mt-4"><div className="flex justify-between"><b>استكمل من حيث توقفت</b><span className="text-[var(--primary)]">72%</span></div><div className="h-3 bg-gray-100 rounded-full mt-3"><div className="h-full w-[72%] bg-[var(--primary)] rounded-full"/></div><div className="muted mt-3">الدرس: قوانين الحركة</div></div></div></div></section><section className="pb-16"><div className="container grid grid-cols-2 md:grid-cols-4 gap-4"><Stat label="طلاب" value="+5,000"/><Stat label="كورس" value="60+"/><Stat label="درس" value="900+"/><Stat label="رضا الطلاب" value="96%"/></div></section><section id="grades" className="py-16 bg-white"><div className="container"><div className="max-w-2xl"><h2 className="text-4xl font-black">مراحل الثانوية العامة</h2><p className="muted mt-3">اختار صفك الدراسي وابدأ الوصول للمحتوى والكورسات والاختبارات المخصصة ليك.</p></div><div className="grid md:grid-cols-3 gap-5 mt-8">{grades.map(([g,n])=><div className="card p-6 hover:-translate-y-1 transition" key={g}><div className="w-14 h-14 rounded-2xl bg-[var(--primary-soft)] text-[var(--primary)] grid place-items-center font-black">{n}</div><h3 className="font-black text-xl mt-5">{g}</h3><div className="muted text-sm mt-2">كورسات ودروس واختبارات مخصصة</div><Link href="/register" className="btn btn-soft mt-5 w-full">استكشف الصف</Link></div>)}</div></div></section><section id="courses" className="py-16"><div className="container"><h2 className="text-4xl font-black">ابدأ بأهم الكورسات</h2><p className="muted mt-3">محتوى منظم يساعدك تذاكر وتتابع تقدمك خطوة بخطوة.</p><div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-8"><CourseCard id="demo-arabic" title="اللغة العربية" grade="الثانوية العامة" lessons={42} progress={0}/><CourseCard id="demo-math" title="الرياضيات" grade="الثانوية العامة" lessons={38} progress={0}/><CourseCard id="demo-physics" title="الفيزياء" grade="الثانوية العامة" lessons={31} progress={0}/></div></div></section><section id="features" className="py-16 bg-white"><div className="container"><h2 className="text-4xl font-black">كل اللي تحتاجه في مكان واحد</h2><div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">{features.map(x=><div className="card p-6" key={x}><div className="w-10 h-10 rounded-xl bg-[var(--primary-soft)] text-[var(--primary)] grid place-items-center text-xl font-black">✓</div><h3 className="font-black mt-4">{x}</h3><p className="muted mt-2">تجربة واضحة ومترابطة تساعد الطالب والأسرة والمدرس.</p></div>)}</div></div></section><section id="faq" className="py-16"><div className="container max-w-4xl"><h2 className="text-4xl font-black">أسئلة شائعة</h2><div className="grid gap-4 mt-8"><div className="card p-5"><b>المنصة مخصصة لمين؟</b><p className="muted mt-2">لطلاب الصف الأول والثاني والثالث الثانوي العام.</p></div><div className="card p-5"><b>هل أقدر أتابع أونلاين؟</b><p className="muted mt-2">نعم، المنصة مصممة لدعم التعلم الأونلاين ومتابعة الطالب.</p></div><div className="card p-5"><b>هل ولي الأمر يقدر يتابع الطالب؟</b><p className="muted mt-2">نعم، يوجد حساب مخصص لولي الأمر لمتابعة الحضور والدرجات والتقدم.</p></div></div></div></section><footer className="bg-[#241a2d] text-white py-12"><div className="container flex flex-col md:flex-row justify-between gap-5"><div className="brand-lockup"><img src="/brand-logo.png" className="brand-logo" alt="شعار Eng Moaaz Ismail"/><div><div className="brand-name">Eng Moaaz Ismail</div><div className="text-gray-300 text-sm mt-1">المنصة التعليمية للثانوية العامة</div></div></div><div className="text-gray-300">الشروط • الخصوصية • الدعم</div></div></footer></main>}
+import Link from 'next/link'
+
+const grades = [
+  { title: 'الصف الأول\nالثانوي العام', icon: '▢' },
+  { title: 'الصف الثاني\nالثانوي العام', icon: '▤' },
+  { title: 'الصف الثالث\nالثانوي العام', icon: '⌂' },
+]
+
+const features = [
+  ['▣', 'شرح احترافي', 'فيديوهات عالية الجودة'],
+  ['✓', 'اختبارات دورية', 'تقييم مستمر لمستواك'],
+  ['▤', 'كتب وملخصات حصرية', 'تحميل مباشر بجودة عالية'],
+  ['♟', 'دعم فني مستمر', 'فريق دعم متاح دائمًا'],
+  ['♟', 'مجتمع طلابي قوي', 'كن جزء من مجتمع من الطلاب المتفوقين'],
+  ['♧', 'متابعة ولي الأمر', 'تابع مستوى ابنك أول بأول'],
+]
+
+export default function Home() {
+  return (
+    <main className="landing-page">
+      <header className="site-header">
+        <div className="site-header-inner">
+          <div className="header-brand">
+            <img src="/brand-logo.png" alt="Eng Moaaz Ismail" />
+          </div>
+
+          <nav className="main-nav" aria-label="التنقل الرئيسي">
+            <a className="active" href="#home">الرئيسية</a>
+            <a href="#courses">الكورسات</a>
+            <a href="#books">الكتب</a>
+            <a href="#stages">المراحل</a>
+            <a href="#about">عن المنصة</a>
+            <a href="#teachers">السناتر</a>
+            <a href="#contact">تواصل معنا</a>
+          </nav>
+
+          <div className="header-actions">
+            <span className="theme-toggle" aria-hidden="true"><span /></span>
+            <Link href="/login" className="header-login">تسجيل الدخول <span>♙</span></Link>
+            <Link href="/register" className="header-register">إنشاء حساب <span>◈</span></Link>
+          </div>
+        </div>
+      </header>
+
+      <section id="home" className="hero-section">
+        <div className="hero-inner">
+          <div className="hero-copy">
+            <div className="hero-badge">🎓 المنصة التعليمية الأقوى لطلاب الثانوية العامة</div>
+            <h1>رحلتك للنجاح<br /><span>تبدأ من هنا</span></h1>
+            <p>
+              مع Eng Moaaz Ismail هتتعلم بطريقة مختلفة.. شرح مبسط، محتوى احترافي، متابعة مستمرة، واختبارات شاملة تساعدك تحقق أعلى درجاتك في الثانوية العامة.
+            </p>
+            <div className="hero-buttons">
+              <Link href="/register" className="hero-primary">ابدأ الآن <span>←</span></Link>
+              <a href="#stages" className="hero-secondary">استكشف الكورسات</a>
+            </div>
+            <div className="hero-trust">
+              <div className="trust-item"><div className="avatars"><i /><i /><i /></div><div><strong>+50,000</strong><small>طالب بيثقوا في المنصة</small></div></div>
+              <div className="trust-item rating"><strong>4.9</strong><span>★★★★★</span><small>تقييم الطلاب للمنصة</small></div>
+            </div>
+          </div>
+
+          <div className="hero-visual">
+            <div className="hero-orbit orbit-one" />
+            <div className="hero-orbit orbit-two" />
+            <div className="hero-glow" />
+            <img src="/hero-art.svg" alt="Eng Moaaz Ismail platform" className="hero-art" />
+          </div>
+        </div>
+      </section>
+
+      <section id="stages" className="stages-section">
+        <div className="stages-inner">
+          <div className="stages-heading">
+            <span>الثانوية العامة</span>
+            <h2>اختر مرحلتك الدراسية</h2>
+            <p>ابدأ رحلتك الآن واختر الصف الخاص بك</p>
+          </div>
+          <div className="grade-cards">
+            {grades.map((grade) => (
+              <Link href="/register" className="grade-card" key={grade.title}>
+                <div className="grade-icon">{grade.icon}</div>
+                <h3>{grade.title.split('\n').map((line) => <span key={line}>{line}<br /></span>)}</h3>
+                <b>←</b>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="stats-strip" aria-label="إحصائيات المنصة">
+        <div><strong>+50,000</strong><span>طالب وطالبة</span><em>♟</em></div>
+        <div><strong>+150</strong><span>كورس تعليمي</span><em>▤</em></div>
+        <div><strong>+1,200</strong><span>ساعة شرح مسجلة</span><em>▣</em></div>
+        <div><strong>+98%</strong><span>نسبة رضا الطلاب</span><em>♡</em></div>
+      </section>
+
+      <section id="about" className="why-section">
+        <div className="why-heading">
+          <h2>ليه تختار منصة <span>Eng Moaaz Ismail</span> ؟</h2>
+          <p>كل ما تحتاجه في مكان واحد لتحقيق أعلى درجاتك</p>
+        </div>
+        <div className="features-grid">
+          {features.map(([icon, title, desc]) => (
+            <article className="feature-card" key={title}>
+              <div className="feature-icon">{icon}</div>
+              <h3>{title}</h3>
+              <p>{desc}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="bottom-cta" id="contact">
+        <div className="cta-brand"><img src="/brand-logo.png" alt="Eng Moaaz Ismail" /></div>
+        <div className="cta-copy"><strong>مستقبلك يبدأ بقرار .. ابدأ الآن مع Eng Moaaz Ismail</strong><span>انضم إلى آلاف الطلاب وابدأ رحلتك نحو التفوق في الثانوية العامة</span></div>
+        <Link href="/register" className="cta-button">إنشاء حساب الآن <span>←</span></Link>
+        <div className="cta-side">مجهودك اليوم..<br /><b>هو مستقبلك غدًا</b></div>
+      </section>
+
+      <footer className="site-footer">
+        <span>© Eng Moaaz Ismail</span>
+        <span>الشروط • الخصوصية • الدعم</span>
+      </footer>
+    </main>
+  )
+}
