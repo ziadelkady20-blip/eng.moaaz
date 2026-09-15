@@ -32,9 +32,10 @@ const features = [
 ] as const
 
 const uiStyles = `
-.brand-lockup{display:flex;align-items:center;gap:10px;direction:rtl}.brand-logo{width:50px;height:50px;flex:0 0 50px;display:block;object-fit:cover;border-radius:15px;box-shadow:0 5px 16px rgba(44,20,72,.14);border:1px solid rgba(109,47,163,.12)}.brand-copy{display:flex;flex-direction:column;line-height:1.08}.brand-copy strong{font-size:15px;letter-spacing:0;color:#241a2d;font-weight:1000}.brand-copy span{font-size:10px;color:#76518e;font-weight:800;margin-top:5px}.hero-section{min-height:450px;background:radial-gradient(circle at 18% 50%,#f5edff 0,#fff 36%,#fff 100%)}.hero-inner{min-height:450px;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:34px}.hero-visual{height:auto;min-height:0;justify-content:center;overflow:visible}.hero-art{width:100%;max-width:860px;height:auto;aspect-ratio:2048/758;object-fit:cover;object-position:center;border-radius:20px;filter:drop-shadow(0 18px 30px rgba(62,26,92,.12))}.hero-copy{padding:30px 0 28px}.hero-copy h1{font-size:56px;line-height:1.08;letter-spacing:-1.8px}.hero-copy p{max-width:600px;font-size:17px;line-height:1.9}.hero-badge{box-shadow:0 7px 20px rgba(109,47,163,.08)}.hero-buttons{margin-top:22px}.hero-primary{min-width:150px}.hero-secondary{min-width:165px}.hero-trust{margin-top:24px}.site-header{height:82px}.site-header-inner{width:min(1460px,calc(100% - 56px));gap:30px}.header-brand{width:260px}.main-nav{gap:34px}.header-actions{width:300px}.stages-section{padding-top:24px}.stages-inner{padding:22px 30px;border-radius:26px}.grade-card{height:126px}.grade-icon,.feature-icon{display:grid;place-items:center;color:#6d2fa3}.grade-icon{width:54px;height:54px;border-radius:16px;background:#faf5ff}.grade-icon svg{width:36px;height:36px;stroke-width:1.7}.feature-icon{width:48px;height:48px;margin:0 auto 8px;border-radius:14px;background:#faf5ff}.feature-icon svg{width:27px;height:27px}.stats-strip em{display:grid;place-items:center;font-style:normal}.stats-strip em svg{width:28px;height:28px}.why-section{padding-top:28px}.feature-card{min-height:132px;padding:17px}.bottom-cta{min-height:116px;border-radius:22px}.cta-brand .brand-logo{border-color:rgba(255,255,255,.25)}.cta-brand .brand-copy strong{font-size:14px}.cta-brand .brand-copy span{font-size:10px}
-@media(max-width:1100px){.hero-inner{grid-template-columns:1fr 1fr;gap:20px}.hero-copy h1{font-size:48px}.hero-art{width:100%;height:auto}.main-nav{gap:18px}.header-brand{width:230px}.brand-logo{width:44px;height:44px;flex-basis:44px}}
-@media(max-width:760px){.site-header{height:68px}.header-brand{width:auto}.hero-inner{grid-template-columns:1fr;min-height:auto}.hero-visual{height:auto;order:1}.hero-art{width:100%;max-width:100%;height:auto;border-radius:16px}.hero-copy{order:2;padding:18px 0 30px}.hero-copy h1{font-size:42px}.hero-copy p{font-size:15px}.brand-copy strong{font-size:12px}.brand-logo{width:40px;height:40px;flex-basis:40px}.features-grid{grid-template-columns:repeat(2,1fr)}}
+.brand-lockup{display:flex;align-items:center;direction:rtl}.brand-logo{width:58px;height:58px;flex:0 0 58px;display:block;object-fit:cover;border-radius:15px;box-shadow:0 5px 16px rgba(44,20,72,.14);border:1px solid rgba(109,47,163,.12)}
+.hero-section{min-height:450px;background:radial-gradient(circle at 18% 50%,#f5edff 0,#fff 36%,#fff 100%)}.hero-inner{min-height:450px;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:34px}.hero-visual{height:auto;min-height:0;justify-content:center;overflow:visible}.hero-art{width:100%;max-width:860px;height:auto;aspect-ratio:2048/758;object-fit:cover;object-position:center;border-radius:20px;filter:drop-shadow(0 18px 30px rgba(62,26,92,.12))}.hero-copy{padding:30px 0 28px}.hero-copy h1{font-size:56px;line-height:1.08;letter-spacing:-1.8px}.hero-copy p{max-width:600px;font-size:17px;line-height:1.9}.hero-badge{box-shadow:0 7px 20px rgba(109,47,163,.08)}.hero-buttons{margin-top:22px}.hero-primary{min-width:150px}.hero-secondary{min-width:165px}.hero-trust{margin-top:24px}.site-header{height:82px}.site-header-inner{width:min(1460px,calc(100% - 56px));gap:30px}.header-brand{width:110px}.main-nav{gap:34px}.header-actions{width:300px}.stages-section{padding-top:24px}.stages-inner{padding:22px 30px;border-radius:26px}.grade-card{height:126px}.grade-icon,.feature-icon{display:grid;place-items:center;color:#6d2fa3}.grade-icon{width:54px;height:54px;border-radius:16px;background:#faf5ff}.grade-icon svg{width:36px;height:36px;stroke-width:1.7}.feature-icon{width:48px;height:48px;margin:0 auto 8px;border-radius:14px;background:#faf5ff}.feature-icon svg{width:27px;height:27px}.stats-strip em{display:grid;place-items:center;font-style:normal}.stats-strip em svg{width:28px;height:28px}.why-section{padding-top:28px}.feature-card{min-height:132px;padding:17px}.bottom-cta{min-height:116px;border-radius:22px}.cta-brand .brand-logo{border-color:rgba(255,255,255,.25)}
+@media(max-width:1100px){.hero-inner{grid-template-columns:1fr 1fr;gap:20px}.hero-copy h1{font-size:48px}.hero-art{width:100%;height:auto}.main-nav{gap:18px}.header-brand{width:90px}.brand-logo{width:48px;height:48px;flex-basis:48px}}
+@media(max-width:760px){.site-header{height:68px}.header-brand{width:auto}.hero-inner{grid-template-columns:1fr;min-height:auto}.hero-visual{height:auto;order:1}.hero-art{width:100%;max-width:100%;height:auto;border-radius:16px}.hero-copy{order:2;padding:18px 0 30px}.hero-copy h1{font-size:42px}.hero-copy p{font-size:15px}.brand-logo{width:44px;height:44px;flex-basis:44px}.features-grid{grid-template-columns:repeat(2,1fr)}}
 `
 
 export default function Home() {
@@ -43,102 +44,17 @@ export default function Home() {
       <style>{uiStyles}</style>
       <header className="site-header">
         <div className="site-header-inner">
-          <div className="header-brand">
-            <div className="brand-lockup">
-              <img src="/logo.jpeg" alt="برمجها مع معاذ" className="brand-logo" />
-              <div className="brand-copy"><strong>برمجها مع معاذ</strong><span>معًا نحقق نجاحك</span></div>
-            </div>
-          </div>
-          <nav className="main-nav" aria-label="التنقل الرئيسي">
-            <a className="active" href="#home">الرئيسية</a>
-            <a href="#courses">الكورسات</a>
-            <a href="#books">الكتب</a>
-            <a href="#stages">المراحل</a>
-            <a href="#about">عن المنصة</a>
-            <a href="#teachers">السناتر</a>
-            <a href="#contact">تواصل معنا</a>
-          </nav>
-          <div className="header-actions">
-            <span className="theme-toggle" aria-hidden="true"><span /></span>
-            <Link href="/login" className="header-login">تسجيل الدخول <span>♙</span></Link>
-            <Link href="/register" className="header-register">إنشاء حساب <span>◈</span></Link>
-          </div>
+          <div className="header-brand"><div className="brand-lockup"><img src="/logo.png" alt="برمجها مع معاذ" className="brand-logo" /></div></div>
+          <nav className="main-nav" aria-label="التنقل الرئيسي"><a className="active" href="#home">الرئيسية</a><a href="#courses">الكورسات</a><a href="#books">الكتب</a><a href="#stages">المراحل</a><a href="#about">عن المنصة</a><a href="#teachers">السناتر</a><a href="#contact">تواصل معنا</a></nav>
+          <div className="header-actions"><span className="theme-toggle" aria-hidden="true"><span /></span><Link href="/login" className="header-login">تسجيل الدخول <span>♙</span></Link><Link href="/register" className="header-register">إنشاء حساب <span>◈</span></Link></div>
         </div>
       </header>
-
-      <section id="home" className="hero-section">
-        <div className="hero-inner">
-          <div className="hero-copy">
-            <div className="hero-badge">🎓 المنصة التعليمية الأقوى لطلاب الثانوية العامة</div>
-            <h1>رحلتك للنجاح<br /><span>تبدأ من هنا</span></h1>
-            <p>مع برمجها مع معاذ هتتعلم بطريقة مختلفة.. شرح مبسط، محتوى احترافي، متابعة مستمرة، واختبارات شاملة تساعدك تحقق أعلى درجاتك في الثانوية العامة.</p>
-            <div className="hero-buttons">
-              <Link href="/register" className="hero-primary">ابدأ الآن <span>←</span></Link>
-              <a href="#stages" className="hero-secondary">استكشف الكورسات</a>
-            </div>
-            <div className="hero-trust">
-              <div className="trust-item"><div className="avatars"><i /><i /><i /></div><div><strong>+50,000</strong><small>طالب بيثقوا في المنصة</small></div></div>
-              <div className="trust-item rating"><strong>4.9</strong><span>★★★★★</span><small>تقييم الطلاب للمنصة</small></div>
-            </div>
-          </div>
-          <div className="hero-visual">
-            <img src="/hero.png" alt="برمجها مع معاذ" className="hero-art" />
-          </div>
-        </div>
-      </section>
-
-      <section id="stages" className="stages-section">
-        <div className="stages-inner">
-          <div className="stages-heading">
-            <span>الثانوية العامة</span>
-            <h2>اختر مرحلتك الدراسية</h2>
-            <p>ابدأ رحلتك الآن واختر الصف الخاص بك</p>
-          </div>
-          <div className="grade-cards">
-            {grades.map((grade) => (
-              <Link href="/register" className="grade-card" key={grade.title}>
-                <div className="grade-icon"><Icon name={grade.icon} /></div>
-                <h3>{grade.title.split('\n').map((line) => <span key={line}>{line}<br /></span>)}</h3>
-                <b>←</b>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="stats-strip" aria-label="إحصائيات المنصة">
-        <div><strong>+50,000</strong><span>طالب وطالبة</span><em><Icon name="users" /></em></div>
-        <div><strong>+150</strong><span>كورس تعليمي</span><em><Icon name="book" /></em></div>
-        <div><strong>+1,200</strong><span>ساعة شرح مسجلة</span><em><Icon name="video" /></em></div>
-        <div><strong>+98%</strong><span>نسبة رضا الطلاب</span><em><Icon name="heart" /></em></div>
-      </section>
-
-      <section id="about" className="why-section">
-        <div className="why-heading">
-          <h2>ليه تختار منصة <span>برمجها مع معاذ</span> ؟</h2>
-          <p>كل ما تحتاجه في مكان واحد لتحقيق أعلى درجاتك</p>
-        </div>
-        <div className="features-grid">
-          {features.map(([icon, title, desc]) => (
-            <article className="feature-card" key={title}>
-              <div className="feature-icon"><Icon name={icon} /></div>
-              <h3>{title}</h3>
-              <p>{desc}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="bottom-cta" id="contact">
-        <div className="cta-brand"><div className="brand-lockup"><img src="/logo.jpeg" alt="برمجها مع معاذ" className="brand-logo" /><div className="brand-copy"><strong style={{color:'#fff'}}>برمجها مع معاذ</strong><span style={{color:'#dfd0ed'}}>معًا نحقق نجاحك</span></div></div></div>
-        <div className="cta-copy"><strong>مستقبلك يبدأ بقرار .. ابدأ الآن مع برمجها معاذ</strong><span>انضم إلى آلاف الطلاب وابدأ رحلتك نحو التفوق في الثانوية العامة</span></div>
-        <Link href="/register" className="cta-button">إنشاء حساب الآن <span>←</span></Link>
-        <div className="cta-side">مجهودك اليوم..<br /><b>هو مستقبلك غدًا</b></div>
-      </section>
-      <footer className="site-footer">
-        <span>© برمجها مع معاذ</span>
-        <span>الشروط • الخصوصية • الدعم</span>
-      </footer>
+      <section id="home" className="hero-section"><div className="hero-inner"><div className="hero-copy"><div className="hero-badge">🎓 المنصة التعليمية الأقوى لطلاب الثانوية العامة</div><h1>رحلتك للنجاح<br /><span>تبدأ من هنا</span></h1><p>مع برمجها مع معاذ هتتعلم بطريقة مختلفة.. شرح مبسط، محتوى احترافي، متابعة مستمرة، واختبارات شاملة تساعدك تحقق أعلى درجاتك في الثانوية العامة.</p><div className="hero-buttons"><Link href="/register" className="hero-primary">ابدأ الآن <span>←</span></Link><a href="#stages" className="hero-secondary">استكشف الكورسات</a></div><div className="hero-trust"><div className="trust-item"><div className="avatars"><i /><i /><i /></div><div><strong>+50,000</strong><small>طالب بيثقوا في المنصة</small></div></div><div className="trust-item rating"><strong>4.9</strong><span>★★★★★</span><small>تقييم الطلاب للمنصة</small></div></div></div><div className="hero-visual"><img src="/hero.png" alt="برمجها مع معاذ" className="hero-art" /></div></div></section>
+      <section id="stages" className="stages-section"><div className="stages-inner"><div className="stages-heading"><span>الثانوية العامة</span><h2>اختر مرحلتك الدراسية</h2><p>ابدأ رحلتك الآن واختر الصف الخاص بك</p></div><div className="grade-cards">{grades.map((grade)=><Link href="/register" className="grade-card" key={grade.title}><div className="grade-icon"><Icon name={grade.icon} /></div><h3>{grade.title.split('\n').map(line=><span key={line}>{line}<br /></span>)}</h3><b>←</b></Link>)}</div></div></section>
+      <section className="stats-strip" aria-label="إحصائيات المنصة"><div><strong>+50,000</strong><span>طالب وطالبة</span><em><Icon name="users" /></em></div><div><strong>+150</strong><span>كورس تعليمي</span><em><Icon name="book" /></em></div><div><strong>+1,200</strong><span>ساعة شرح مسجلة</span><em><Icon name="video" /></em></div><div><strong>+98%</strong><span>نسبة رضا الطلاب</span><em><Icon name="heart" /></em></div></section>
+      <section id="about" className="why-section"><div className="why-heading"><h2>ليه تختار منصة <span>برمجها مع معاذ</span> ؟</h2><p>كل ما تحتاجه في مكان واحد لتحقيق أعلى درجاتك</p></div><div className="features-grid">{features.map(([icon,title,desc])=><article className="feature-card" key={title}><div className="feature-icon"><Icon name={icon} /></div><h3>{title}</h3><p>{desc}</p></article>)}</div></section>
+      <section className="bottom-cta" id="contact"><div className="cta-brand"><div className="brand-lockup"><img src="/logo.png" alt="برمجها مع معاذ" className="brand-logo" /></div></div><div className="cta-copy"><strong>مستقبلك يبدأ بقرار .. ابدأ الآن مع برمجها معاذ</strong><span>انضم إلى آلاف الطلاب وابدأ رحلتك نحو التفوق في الثانوية العامة</span></div><Link href="/register" className="cta-button">إنشاء حساب الآن <span>←</span></Link><div className="cta-side">مجهودك اليوم..<br /><b>هو مستقبلك غدًا</b></div></section>
+      <footer className="site-footer"><span>© برمجها معاذ</span><span>الشروط • الخصوصية • الدعم</span></footer>
     </main>
   )
 }
