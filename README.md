@@ -2,6 +2,10 @@
 
 Arabic-first RTL LMS for Egyptian General Secondary students: الصف الأول والثاني والثالث الثانوي العام.
 
+## Deployment
+- Vercel build path fixed: `app/layout.tsx` imports the local `app/globals.css` stylesheet.
+- This commit is intentionally used to trigger a fresh deployment from `main`.
+
 ## V13 Release Candidate / Final Audit
 - Signed, HTTP-only session cookie with constant-time signature verification.
 - Production requires `AUTH_SECRET`; development uses a dev-only fallback.
@@ -62,7 +66,6 @@ Demo teacher: `01100000000` / `Demo1234!`
 - For stronger video protection, use a provider supporting signed playback/DRM rather than relying on YouTube Unlisted alone.
 - External rate limiting (Redis/edge/WAF) for multi-instance deployments; the included limiter is a single-process safety net.
 - Run database migrations through a controlled CI/CD process.
-
 
 ## V14 production hardening
 Encrypted YouTube tokens, payment webhook retry safety, refund closure, production env validation, and a complete initial PostgreSQL migration baseline are included.
