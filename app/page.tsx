@@ -15,13 +15,23 @@ const features = [
   ['♧', 'متابعة ولي الأمر', 'تابع مستوى ابنك أول بأول'],
 ]
 
+const uiStyles = `
+.brand-lockup{display:flex;align-items:center;gap:10px;direction:rtl}.brand-badge{width:44px;height:44px;border-radius:13px;background:linear-gradient(145deg,#6d2fa3,#8b5cf6);display:grid;place-items:center;color:#fff;font-size:17px;font-weight:1000;box-shadow:0 8px 20px rgba(109,47,163,.2)}.brand-copy{display:flex;flex-direction:column;line-height:1.05}.brand-copy strong{font-size:14px;letter-spacing:.2px;color:#241a2d;font-weight:1000}.brand-copy span{font-size:10px;color:#76518e;font-weight:800;margin-top:4px}.hero-section{min-height:510px;background:radial-gradient(circle at 18% 50%,#f5edff 0,#fff 36%,#fff 100%)}.hero-inner{min-height:510px;grid-template-columns:1fr 1fr;gap:42px}.hero-visual{height:510px;justify-content:center;overflow:visible}.hero-art{width:min(510px,100%);height:510px;object-fit:contain;object-position:center;transform:none;border-radius:28px;filter:drop-shadow(0 24px 35px rgba(62,26,92,.14))}.hero-copy{padding:42px 0 34px}.hero-copy h1{font-size:60px;line-height:1.08;letter-spacing:-2px}.hero-copy p{max-width:600px;font-size:17px;line-height:1.95}.hero-badge{box-shadow:0 7px 20px rgba(109,47,163,.08)}.hero-buttons{margin-top:25px}.hero-primary{min-width:150px}.hero-secondary{min-width:165px}.hero-trust{margin-top:27px}.site-header{height:82px}.site-header-inner{width:min(1460px,calc(100% - 56px));gap:30px}.header-brand{width:250px}.header-brand img{display:none}.main-nav{gap:34px}.header-actions{width:300px}.stages-section{padding-top:24px}.stages-inner{padding:22px 30px;border-radius:26px}.grade-card{height:126px}.why-section{padding-top:28px}.feature-card{min-height:132px;padding:17px}.bottom-cta{min-height:116px;border-radius:22px}
+@media(max-width:1100px){.hero-inner{grid-template-columns:1fr 1fr;gap:20px}.hero-copy h1{font-size:48px}.hero-art{width:100%;height:460px}.hero-visual{height:460px}.main-nav{gap:18px}.header-brand{width:210px}}
+@media(max-width:760px){.site-header{height:68px}.header-brand{width:auto}.hero-inner{grid-template-columns:1fr;min-height:auto}.hero-visual{height:370px;order:1}.hero-art{width:min(370px,100%);height:370px}.hero-copy{order:2;padding:18px 0 30px}.hero-copy h1{font-size:42px}.hero-copy p{font-size:15px}.brand-copy strong{font-size:12px}.brand-badge{width:38px;height:38px}.features-grid{grid-template-columns:repeat(2,1fr)}}
+`
+
 export default function Home() {
   return (
     <main className="landing-page">
+      <style>{uiStyles}</style>
       <header className="site-header">
         <div className="site-header-inner">
           <div className="header-brand">
-            <img src="/Logo.jpeg" alt="Eng Moaaz Ismail" />
+            <div className="brand-lockup">
+              <div className="brand-badge">EM</div>
+              <div className="brand-copy"><strong>ENG MOAAZ ISMAIL</strong><span>منصة معاذ إسماعيل التعليمية</span></div>
+            </div>
           </div>
           <nav className="main-nav" aria-label="التنقل الرئيسي">
             <a className="active" href="#home">الرئيسية</a>
@@ -104,7 +114,7 @@ export default function Home() {
       </section>
 
       <section className="bottom-cta" id="contact">
-        <div className="cta-brand"><img src="/Logo.jpeg" alt="Eng Moaaz Ismail" /></div>
+        <div className="cta-brand"><div className="brand-lockup"><div className="brand-badge">EM</div><div className="brand-copy"><strong style={{color:'#fff'}}>ENG MOAAZ ISMAIL</strong><span style={{color:'#dfd0ed'}}>منصة معاذ إسماعيل التعليمية</span></div></div></div>
         <div className="cta-copy"><strong>مستقبلك يبدأ بقرار .. ابدأ الآن مع Eng Moaaz Ismail</strong><span>انضم إلى آلاف الطلاب وابدأ رحلتك نحو التفوق في الثانوية العامة</span></div>
         <Link href="/register" className="cta-button">إنشاء حساب الآن <span>←</span></Link>
         <div className="cta-side">مجهودك اليوم..<br /><b>هو مستقبلك غدًا</b></div>
