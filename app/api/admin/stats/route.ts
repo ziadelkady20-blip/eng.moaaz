@@ -1,0 +1,2 @@
+import {NextResponse} from 'next/server'; import {db} from '@/lib/db'; import {requireRole} from '@/lib/auth'
+export async function GET(){try{await requireRole(['ADMIN']);const [students,courses,pending,lessons]=await Promise.all([db.user.count({where:{role:'STUDENT'}}),db.course.count(),db.order.count({where:{status:'PENDING'}}),db.lesson.count({where:{videoId:{not:null}}})]);return NextResponse.json({students,courses,pending,lessons})}catch{return NextResponse.json({error:'غير مصرح'},{status:401})}}

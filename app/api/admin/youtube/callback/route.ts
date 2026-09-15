@@ -1,0 +1,7 @@
+import {NextResponse} from 'next/server'
+import {getYoutubeOAuthClient} from '@/lib/youtube'
+import {db} from '@/lib/db'
+import {getCurrentUser} from '@/lib/auth'
+import {encryptSecret} from '@/lib/secretbox'
+export const runtime='nodejs'
+export async function GET(req:Request){try{const user=await getCurrentUser();if(!user||user.role!=='ADMIN')return NextResponse.redirect(new URL('/login',req.url));const code=new URL(req.url).searchParams.get('code');if(!code) return NextResponse.redirect(new URL('/admin/settings?youtube=error',req.url));const client=getYoutubeOAuthClient();const {tokens}=await client.getToken(code);if(!tokens.refresh_token) return NextResponse.redirect(new URL('/admin/settings?youtube=missing_refresh',req.url));client.setCredentials(tokens);const yt=(await import('googleapis')).google.youtube({version:'v3',auth:client});const me=await yt.channels.list({part:['snippet'],mine:true});const channel=me.data.items?.[0];await db.youtubeConnection.upsert({where:{userId:user.id},create:{userId:user.id,refreshToken:encryptSecret(tokens.refresh_token),channelId:channel?.id,channelTitle:channel?.snippet?.title},update:{refreshToken:encryptSecret(tokens.refresh_token),channelId:channel?.id,channelTitle:channel?.snippet?.title}});return NextResponse.redirect(new URL('/admin/settings?youtube=connected',req.url))}catch{return NextResponse.redirect(new URL('/admin/settings?youtube=error',req.url))}}
