@@ -23,7 +23,6 @@ export default function Home() {
           <div className="header-brand">
             <img src="/brand-logo.png" alt="Eng Moaaz Ismail" />
           </div>
-
           <nav className="main-nav" aria-label="التنقل الرئيسي">
             <a className="active" href="#home">الرئيسية</a>
             <a href="#courses">الكورسات</a>
@@ -33,7 +32,6 @@ export default function Home() {
             <a href="#teachers">السناتر</a>
             <a href="#contact">تواصل معنا</a>
           </nav>
-
           <div className="header-actions">
             <span className="theme-toggle" aria-hidden="true"><span /></span>
             <Link href="/login" className="header-login">تسجيل الدخول <span>♙</span></Link>
@@ -47,9 +45,7 @@ export default function Home() {
           <div className="hero-copy">
             <div className="hero-badge">🎓 المنصة التعليمية الأقوى لطلاب الثانوية العامة</div>
             <h1>رحلتك للنجاح<br /><span>تبدأ من هنا</span></h1>
-            <p>
-              مع Eng Moaaz Ismail هتتعلم بطريقة مختلفة.. شرح مبسط، محتوى احترافي، متابعة مستمرة، واختبارات شاملة تساعدك تحقق أعلى درجاتك في الثانوية العامة.
-            </p>
+            <p>مع Eng Moaaz Ismail هتتعلم بطريقة مختلفة.. شرح مبسط، محتوى احترافي، متابعة مستمرة، واختبارات شاملة تساعدك تحقق أعلى درجاتك في الثانوية العامة.</p>
             <div className="hero-buttons">
               <Link href="/register" className="hero-primary">ابدأ الآن <span>←</span></Link>
               <a href="#stages" className="hero-secondary">استكشف الكورسات</a>
@@ -59,12 +55,8 @@ export default function Home() {
               <div className="trust-item rating"><strong>4.9</strong><span>★★★★★</span><small>تقييم الطلاب للمنصة</small></div>
             </div>
           </div>
-
           <div className="hero-visual">
-            <div className="hero-orbit orbit-one" />
-            <div className="hero-orbit orbit-two" />
-            <div className="hero-glow" />
-            <img src="/hero-art.svg" alt="Eng Moaaz Ismail platform" className="hero-art" />
+            <img src="/hero-real.svg" alt="Eng Moaaz Ismail platform" className="hero-art" style={{width:'100%',height:'auto',objectFit:'contain',objectPosition:'center',transform:'none'}} />
           </div>
         </div>
       </section>
@@ -117,7 +109,6 @@ export default function Home() {
         <Link href="/register" className="cta-button">إنشاء حساب الآن <span>←</span></Link>
         <div className="cta-side">مجهودك اليوم..<br /><b>هو مستقبلك غدًا</b></div>
       </section>
-
       <footer className="site-footer">
         <span>© Eng Moaaz Ismail</span>
         <span>الشروط • الخصوصية • الدعم</span>
