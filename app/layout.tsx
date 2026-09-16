@@ -7,5 +7,13 @@ export const metadata = {
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  return <html lang="ar" dir="rtl"><head><link rel="stylesheet" href="/hero-animations.css" /></head><body>{children}</body></html>
+  return (
+    <html lang="ar" dir="rtl">
+      <head>
+        <link rel="stylesheet" href="/hero-animations.css" />
+        <style>{`@font-face{font-family:'Rabie';src:url('/Rabie-Light.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap}`}</style>
+      </head>
+      <body style={{fontFamily:"'Rabie', Arial, 'Noto Sans Arabic', sans-serif"}}>{children}</body>
+    </html>
+  )
 }
