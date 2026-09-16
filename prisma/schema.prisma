@@ -59,8 +59,17 @@ model User {
   supportAssigned      SupportConversation[] @relation("SupportAssignee")
   subscriptions        Subscription[]
   uploadedFiles        UploadedFile[]
-  auditLogs            AuditLog[]
-  supportMessages      SupportMessage[]
+  auditLogs             AuditLog[]
+  supportMessages       SupportMessage[]
+  siteSettingsUpdated   SiteSetting[]        @relation("SiteSettingsUpdater")
+}
+
+model SiteSetting {
+  id          String   @id @default("site")
+  data        Json
+  updatedAt   DateTime @updatedAt
+  updatedById String?
+  updatedBy   User?    @relation("SiteSettingsUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
 }
 
 model Student {
@@ -159,7 +168,7 @@ model Course {
   assignments   Assignment[]
   grade         Grade              @relation(fields: [gradeId], references: [id])
   subject       Subject            @relation(fields: [subjectId], references: [id])
-  teacher       Teacher            @relation(fields: [teacherId], references: [id])
+  teacher       Teacher             @relation(fields: [teacherId], references: [id])
   subscriptions Subscription[]
   createdAt     DateTime           @default(now())
   updatedAt     DateTime           @updatedAt
@@ -296,7 +305,7 @@ model Assignment {
   dueAt       DateTime
   courseId    String?
   submissions AssignmentSubmission[]
-  course      Course?                @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  course      Course?               @relation(fields: [courseId], references: [id], onDelete: SetNull)
 }
 
 model AssignmentSubmission {
@@ -431,7 +440,7 @@ model Order {
 }
 
 model Payment {
-  id            String        @id @default(cuid())
+  id            String        @id
   orderId       String
   status        PaymentStatus @default(PENDING)
   method        String?
@@ -469,7 +478,7 @@ model Coupon {
   usageLimit Int?
   usedCount  Int       @default(0)
   courseId   String?
-  course     Course?   @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  course     Course?  @relation(fields: [courseId], references: [id], onDelete: SetNull)
   orders     Order[]
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
@@ -563,4 +572,4 @@ model PaymentWebhookEvent {
   receivedAt DateTime @default(now())
   status     String
   orderId    String?
-}
+} 
