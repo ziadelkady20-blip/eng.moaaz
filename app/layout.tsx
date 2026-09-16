@@ -5,6 +5,8 @@ import ScrollProgress from '@/components/ScrollProgress'
 import MarketingScripts from '@/components/MarketingScripts'
 import { getSiteSettings } from '@/lib/site-settings'
 
+export const dynamic = 'force-dynamic'
+
 export async function generateMetadata() {
   const site = await getSiteSettings()
   return {
