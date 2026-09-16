@@ -16,6 +16,8 @@ export type SiteSettings = {
   whatsapp: string
   seoTitle: string
   seoDescription: string
+  metaPixelId: string
+  googleAnalyticsId: string
 }
 
 export const DEFAULT_SITE_SETTINGS: SiteSettings = {
@@ -33,7 +35,9 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   supportPhone: '',
   whatsapp: '',
   seoTitle: 'Eng Moaaz Ismail | المنصة التعليمية',
-  seoDescription: 'منصة Eng Moaaz Ismail التعليمية لطلاب المرحلة الثانوية.'
+  seoDescription: 'منصة Eng Moaaz Ismail التعليمية لطلاب المرحلة الثانوية.',
+  metaPixelId: '',
+  googleAnalyticsId: '',
 }
 
 function normalize(value: unknown): Partial<SiteSettings> {
