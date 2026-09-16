@@ -21,6 +21,8 @@ const fields: Array<[keyof FormState, string, string, number]> = [
   ['whatsapp', 'واتساب', 'رقم واتساب بدون + أو مسافات', 30],
   ['seoTitle', 'SEO Title', 'عنوان نتائج البحث', 180],
   ['seoDescription', 'SEO Description', 'وصف نتائج البحث', 300],
+  ['metaPixelId', 'Meta Pixel ID', 'ضع رقم الـPixel لتتبع زيارات وحملات Meta', 30],
+  ['googleAnalyticsId', 'Google Analytics ID', 'مثال: G-XXXXXXXXXX', 30],
 ]
 
 export default function WebsiteControlCenter() {
@@ -70,7 +72,7 @@ export default function WebsiteControlCenter() {
         <div>
           <div className="badge">SUPER ADMIN</div>
           <h1 className="text-3xl font-black mt-3">Website Control Center</h1>
-          <p className="muted mt-2">تحكم في الهوية، الهيرو، الإعلانات، الفوتر وSEO من مكان واحد.</p>
+          <p className="muted mt-2">تحكم في الهوية، الهيرو، الإعلانات، الفوتر وSEO وقياس الحملات من مكان واحد.</p>
         </div>
         <button className="btn btn-primary" onClick={save} disabled={loading || saving}>
           {saving ? 'جاري الحفظ...' : 'حفظ التغييرات'}
@@ -94,9 +96,9 @@ export default function WebsiteControlCenter() {
       </div>
 
       <div className="card p-6 mt-5">
-        <h2 className="text-xl font-black">ملاحظات النشر</h2>
+        <h2 className="text-xl font-black">ملاحظات النشر والإعلانات</h2>
         <p className="muted mt-2 leading-8">تغييرات المحتوى محفوظة في PostgreSQL، وليست داخل state مؤقت. أي تعديل هنا يصبح قابلًا للاستخدام من الموقع المنشور بعد الحفظ.</p>
-        <p className="muted mt-1 leading-8">بيانات الدفع وYouTube والمفاتيح السرية لا توضع هنا؛ تظل في متغيرات البيئة وتكاملات الباك إند.</p>
+        <p className="muted mt-1 leading-8">Meta Pixel وGoogle Analytics اختياريان، ولا يتم تحميلهما إلا بعد وضع الـIDs الصحيحة. أسرار الدفع وYouTube والمفاتيح الخاصة تظل خارج لوحة الموقع داخل متغيرات البيئة.</p>
       </div>
     </AdminShell>
   )
