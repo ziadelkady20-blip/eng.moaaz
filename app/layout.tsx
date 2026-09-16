@@ -3,7 +3,7 @@ import { ReactNode } from 'react'
 
 export const metadata = {
   title: 'Eng Moaaz Ismail | المنصة التعليمية',
-  description: 'منصة Eng Moaaz Ismail التعليمية لطلاب الثانوية العامة — أولى وثانية وثالثة ثانوي.'
+  description: 'منصة Eng Moaaz Ismail التعليمية لطلاب الثانوية العامة — أولى وثانية ثانوي.'
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -13,6 +13,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="stylesheet" href="/hero-animations.css" />
         <link rel="stylesheet" href="/rabie-force.css?v=2" />
         <link rel="stylesheet" href="/header-pill.css?v=1" />
+        <link rel="stylesheet" href="/stages-filter.css?v=1" />
         <style>{`@font-face{font-family:'Rabie';src:url('/Rabie-Extralight.ttf?v=2') format('truetype');font-style:normal;font-weight:200 900;font-display:swap}`}</style>
       </head>
       <body style={{fontFamily:"'Rabie', Arial, 'Noto Sans Arabic', sans-serif"}}>{children}</body>
