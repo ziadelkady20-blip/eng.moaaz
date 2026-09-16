@@ -10,39 +10,40 @@ export const metadata = {
 
 const themeScript = `
 (function(){
-  function setupThemeToggle(){
-    var slot=document.querySelector('.site-header .theme-toggle');
-    if(!slot || slot.dataset.themeReady==='1') return !!slot;
-    slot.dataset.themeReady='1';
-    slot.removeAttribute('aria-hidden');
-    slot.setAttribute('role','button');
-    slot.setAttribute('tabindex','0');
-    slot.style.pointerEvents='auto';
-    var moon='<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20.5 15.3A8.5 8.5 0 1 1 8.7 3.5 8.5 8.5 0 0 0 20.5 15.3Z"/></svg>';
-    var sun='<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>';
-    function apply(dark){
-      document.documentElement.classList.toggle('dark-mode',dark);
-      try{localStorage.setItem('eng-moaaz-theme',dark?'dark':'light')}catch(e){}
-      slot.innerHTML=dark?sun:moon;
-      slot.setAttribute('aria-label',dark?'تفعيل الوضع النهاري':'تفعيل الوضع الليلي');
-      slot.setAttribute('title',dark?'الوضع النهاري':'الوضع الليلي');
-    }
-    var initial=false;
-    try{initial=localStorage.getItem('eng-moaaz-theme')==='dark'}catch(e){}
-    apply(initial);
-    slot.addEventListener('click',function(){
-      apply(!document.documentElement.classList.contains('dark-mode'));
-    });
-    slot.addEventListener('keydown',function(e){
-      if(e.key==='Enter'||e.key===' '){e.preventDefault();slot.click();}
-    });
-    return true;
+  function getInitial(){
+    try{return localStorage.getItem('eng-moaaz-theme')==='dark'}catch(e){return false}
   }
-  if(!setupThemeToggle()){
-    var observer=new MutationObserver(function(){if(setupThemeToggle()) observer.disconnect()});
-    if(document.body) observer.observe(document.body,{childList:true,subtree:true});
-    else document.addEventListener('DOMContentLoaded',function(){if(!setupThemeToggle()) observer.observe(document.body,{childList:true,subtree:true})},{once:true});
+  function applyTheme(dark){
+    document.documentElement.classList.toggle('dark-mode', dark)
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
+    try{localStorage.setItem('eng-moaaz-theme', dark ? 'dark' : 'light')}catch(e){}
   }
+
+  applyTheme(getInitial())
+
+  function onThemeClick(event){
+    var target=event.target
+    if(!(target instanceof Element)) return
+    var toggle=target.closest('.site-header .theme-toggle')
+    if(!toggle) return
+    event.preventDefault()
+    event.stopPropagation()
+    applyTheme(!document.documentElement.classList.contains('dark-mode'))
+  }
+
+  function onThemeKeydown(event){
+    if(event.key!=='Enter' && event.key!==' ') return
+    var target=event.target
+    if(!(target instanceof Element)) return
+    var toggle=target.closest('.site-header .theme-toggle')
+    if(!toggle) return
+    event.preventDefault()
+    event.stopPropagation()
+    applyTheme(!document.documentElement.classList.contains('dark-mode'))
+  }
+
+  document.addEventListener('click', onThemeClick, true)
+  document.addEventListener('keydown', onThemeKeydown, true)
 })();
 `
 
@@ -56,7 +57,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="stylesheet" href="/stages-filter.css?v=1" />
         <link rel="stylesheet" href="/scroll-progress.css?v=1" />
         <link rel="stylesheet" href="/books-package.css?v=1" />
-        <link rel="stylesheet" href="/dark-mode-header-fix.css?v=2" />
+        <link rel="stylesheet" href="/dark-mode-header-fix.css?v=3" />
         <style>{`@font-face{font-family:'Rabie';src:url('/Rabie-Extralight.ttf?v=2') format('truetype');font-style:normal;font-weight:200 900;font-display:swap}`}</style>
       </head>
       <body style={{fontFamily:"'Rabie', Arial, 'Noto Sans Arabic', sans-serif"}}><ScrollProgress />{children}<WhatsAppContact /><script dangerouslySetInnerHTML={{__html:themeScript}} /></body>
