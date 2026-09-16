@@ -1,0 +1,15 @@
+/* Floating pill navigation inspired by the supplied reference */
+.site-header{height:0!important;background:transparent!important;border:0!important;box-shadow:none!important;position:relative!important;z-index:100!important;backdrop-filter:none!important}
+.site-header-inner{position:relative!important;top:16px!important;width:min(1320px,calc(100% - 48px))!important;height:62px!important;margin:0 auto!important;padding:0 14px 0 12px!important;background:rgba(255,255,255,.97)!important;border:1px solid rgba(231,226,238,.95)!important;border-radius:999px!important;box-shadow:0 10px 28px rgba(38,25,57,.13),0 2px 6px rgba(38,25,57,.06)!important;backdrop-filter:blur(18px)!important}
+.header-brand{width:190px!important;display:flex!important;align-items:center!important;justify-content:flex-start!important}
+.brand-logo{width:48px!important;height:48px!important;flex:0 0 48px!important;border-radius:14px!important;box-shadow:0 4px 12px rgba(44,20,72,.12)!important}
+.main-nav{gap:34px!important;font-size:14px!important;font-weight:850!important;color:#272238!important}
+.main-nav a{height:62px!important;padding:0 2px!important}
+.main-nav a:after{width:5px!important;height:5px!important;right:-12px!important;top:29px!important;background:#7c3aed!important}
+.main-nav a.active:before{bottom:7px!important;height:3px!important;border-radius:99px!important}
+.header-actions{width:270px!important;gap:7px!important}
+.header-login,.header-register{height:42px!important;border-radius:999px!important}
+.header-login{padding:0 17px!important;background:transparent!important}
+.header-register{padding-inline:20px!important;background:#6d2fa3!important;box-shadow:0 8px 18px rgba(109,47,163,.18)!important}
+@media(max-width:900px){.site-header-inner{width:calc(100% - 24px)!important;padding-inline:10px!important}.main-nav{gap:16px!important;font-size:12px!important}.header-brand{width:auto!important}.header-actions{width:auto!important}.header-login{display:none!important}.brand-logo{width:44px!important;height:44px!important;flex-basis:44px!important}}
+@media(max-width:680px){.site-header-inner{top:10px!important;height:56px!important}.main-nav{gap:10px!important;font-size:10px!important}.main-nav a{height:56px!important}.main-nav a:after{right:-6px!important;top:26px!important}.main-nav a:nth-child(n+4){display:none!important}.header-register{height:38px!important;padding-inline:14px!important;font-size:11px!important}}
