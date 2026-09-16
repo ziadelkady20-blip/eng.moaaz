@@ -2,6 +2,7 @@ import './globals.css'
 import { ReactNode } from 'react'
 import WhatsAppContact from '@/components/WhatsAppContact'
 import ScrollProgress from '@/components/ScrollProgress'
+import DarkModeToggle from '@/components/DarkModeToggle'
 
 export const metadata = {
   title: 'Eng Moaaz Ismail | المنصة التعليمية',
@@ -20,7 +21,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="stylesheet" href="/books-package.css?v=1" />
         <style>{`@font-face{font-family:'Rabie';src:url('/Rabie-Extralight.ttf?v=2') format('truetype');font-style:normal;font-weight:200 900;font-display:swap}`}</style>
       </head>
-      <body style={{fontFamily:"'Rabie', Arial, 'Noto Sans Arabic', sans-serif"}}><ScrollProgress />{children}<WhatsAppContact /></body>
+      <body style={{fontFamily:"'Rabie', Arial, 'Noto Sans Arabic', sans-serif"}}><DarkModeToggle /><ScrollProgress />{children}<WhatsAppContact /></body>
     </html>
   )
 }
