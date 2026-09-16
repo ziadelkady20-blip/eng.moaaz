@@ -6,10 +6,18 @@ import type { Role } from '@prisma/client'
 const COOKIE = 'taallum_session'
 const SECRET = process.env.AUTH_SECRET || (
   process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE !== 'phase-production-build'
-    ? (()=>{ throw new Error('AUTH_SECRET is required in production') })()
+    ? (() => { throw new Error('AUTH_SECRET is required in production') })()
     : 'dev-only-secret-change-me'
 )
 const TTL = 60 * 60 * 24 * 30
+
+export function normalizePhone(value: string) {
+  const translated = value
+    .trim()
+    .replace(/[٠-٩]/g, digit => String('٠١٢٣٤٥٦٧٨٩'.indexOf(digit)))
+    .replace(/[۰-۹]/g, digit => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(digit)))
+  return translated.replace(/[\s()-]/g, '')
+}
 
 export function hashPassword(password: string) {
   const salt = randomBytes(16).toString('hex')
@@ -25,11 +33,19 @@ export function verifyPassword(password: string, stored: string) {
   return expectedBuf.length === actual.length && timingSafeEqual(actual, expectedBuf)
 }
 
-function sign(value: string) { return createHmac('sha256', SECRET).update(value).digest('base64url') }
+function sign(value: string) {
+  return createHmac('sha256', SECRET).update(value).digest('base64url')
+}
+
 export function createSession(userId: string, role: Role) {
-  const payload = Buffer.from(JSON.stringify({ sub: userId, role, exp: Math.floor(Date.now()/1000)+TTL })).toString('base64url')
+  const payload = Buffer.from(JSON.stringify({
+    sub: userId,
+    role,
+    exp: Math.floor(Date.now() / 1000) + TTL,
+  })).toString('base64url')
   return `${payload}.${sign(payload)}`
 }
+
 export function verifySession(token?: string) {
   if (!token) return null
   const [payload, signature] = token.split('.')
@@ -37,24 +53,45 @@ export function verifySession(token?: string) {
   const expected = sign(payload)
   const a = Buffer.from(signature)
   const b = Buffer.from(expected)
-  if (a.length !== b.length || !timingSafeEqual(a,b)) return null
+  if (a.length !== b.length || !timingSafeEqual(a, b)) return null
+
   try {
-    const data = JSON.parse(Buffer.from(payload, 'base64url').toString()) as {sub:string;role:Role;exp:number}
-    if (data.exp < Math.floor(Date.now()/1000)) return null
+    const data = JSON.parse(Buffer.from(payload, 'base64url').toString()) as {
+      sub: string
+      role: Role
+      exp: number
+    }
+    if (!data.sub || data.exp < Math.floor(Date.now() / 1000)) return null
     return data
-  } catch { return null }
+  } catch {
+    return null
+  }
 }
 
 export async function setSession(userId: string, role: Role) {
   const store = await cookies()
-  store.set(COOKIE, createSession(userId, role), { httpOnly:true, secure:process.env.NODE_ENV==='production', sameSite:'lax', path:'/', maxAge:TTL })
+  store.set(COOKIE, createSession(userId, role), {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: TTL,
+  })
 }
-export async function clearSession() { (await cookies()).delete(COOKIE) }
+
+export async function clearSession() {
+  ;(await cookies()).delete(COOKIE)
+}
+
 export async function getCurrentUser() {
   const session = verifySession((await cookies()).get(COOKIE)?.value)
   if (!session) return null
-  return db.user.findUnique({ where:{id:session.sub}, include:{student:true,parent:true,teacher:true} })
+  return db.user.findUnique({
+    where: { id: session.sub },
+    include: { student: true, parent: true, teacher: true },
+  })
 }
+
 export async function requireRole(roles: Role[]) {
   const user = await getCurrentUser()
   if (!user || !roles.includes(user.role)) throw new Error('UNAUTHORIZED')
