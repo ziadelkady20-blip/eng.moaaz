@@ -1,0 +1,20 @@
+'use client'
+import AdminShell from '@/components/AdminShell'
+import {useEffect,useState} from 'react'
+import {ShieldCheck,UserPlus,RefreshCw} from 'lucide-react'
+
+export default function TeamPage(){
+ const [admins,setAdmins]=useState<any[]>([]); const [loading,setLoading]=useState(true); const [saving,setSaving]=useState(false); const [error,setError]=useState('')
+ const [form,setForm]=useState({name:'',phone:'',password:''})
+ async function load(){setLoading(true);setError('');try{const r=await fetch('/api/admin/admins');const d=await r.json();if(!r.ok)throw new Error(d.error||'غير مصرح');setAdmins(d.admins||[])}catch(e){setError(e instanceof Error?e.message:'تعذر التحميل')}finally{setLoading(false)}}
+ useEffect(()=>{load()},[])
+ async function createAdmin(e:React.FormEvent){e.preventDefault();setSaving(true);setError('');try{const r=await fetch('/api/admin/admins',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});const d=await r.json();if(!r.ok)throw new Error(d.error||'تعذر إنشاء الأدمن');setAdmins(a=>[...a,d.admin]);setForm({name:'',phone:'',password:''})}catch(e){setError(e instanceof Error?e.message:'تعذر الإنشاء')}finally{setSaving(false)}}
+ return <AdminShell>
+  <div className="flex items-start justify-between gap-4 mb-7"><div><div className="flex items-center gap-2"><ShieldCheck className="text-[var(--primary)]" size={24}/><h1 className="text-3xl font-black">المشرفون والصلاحيات</h1></div><p className="muted mt-2">السوبر أدمن يضيف ويدير حسابات الأدمن. إدارة المحتوى والمستخدمين متاحة للأدمن حسب وحدات اللوحة الحالية.</p></div><button onClick={load} className="btn btn-soft"><RefreshCw size={17}/> تحديث</button></div>
+  {error&&<div className="rounded-2xl border border-red-200 bg-red-50 text-red-700 p-4 mb-5">{error}</div>}
+  <div className="grid lg:grid-cols-[1fr_1.35fr] gap-6">
+   <form onSubmit={createAdmin} className="card p-6"><h2 className="text-xl font-black mb-5 flex items-center gap-2"><UserPlus size={20}/> إضافة أدمن</h2><div className="space-y-4"><label className="block"><span className="text-sm font-bold">الاسم</span><input className="w-full mt-2 rounded-xl border px-4 py-3" required value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/></label><label className="block"><span className="text-sm font-bold">رقم الهاتف</span><input className="w-full mt-2 rounded-xl border px-4 py-3" required value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})}/></label><label className="block"><span className="text-sm font-bold">كلمة المرور</span><input type="password" minLength={8} className="w-full mt-2 rounded-xl border px-4 py-3" required value={form.password} onChange={e=>setForm({...form,password:e.target.value})}/></label><button disabled={saving} className="btn btn-primary w-full">{saving?'جارٍ الإنشاء…':'إنشاء حساب أدمن'}</button></div></form>
+   <section className="card p-6"><div className="flex items-center justify-between mb-5"><h2 className="text-xl font-black">حسابات الأدمن</h2><span className="badge">{admins.length} حساب</span></div>{loading?<p className="muted">جارٍ التحميل…</p>:<div className="space-y-3">{admins.map(a=><div key={a.id} className="rounded-2xl border p-4 flex items-center justify-between gap-4"><div><div className="font-black">{a.name}</div><div className="muted text-sm mt-1">{a.phone}</div></div><span className="badge">ADMIN</span></div>)}{!admins.length&&<p className="muted">لا يوجد أدمن بعد.</p>}</div>}</section>
+  </div>
+ </AdminShell>
+}
