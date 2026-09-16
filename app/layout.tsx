@@ -2,10 +2,17 @@ import './globals.css'
 import { ReactNode } from 'react'
 import WhatsAppContact from '@/components/WhatsAppContact'
 import ScrollProgress from '@/components/ScrollProgress'
+import { getSiteSettings } from '@/lib/site-settings'
 
-export const metadata = {
-  title: 'Eng Moaaz Ismail | المنصة التعليمية',
-  description: 'منصة Eng Moaaz Ismail التعليمية لطلاب الثانوية العامة — أولى وثانية ثانوي.'
+export async function generateMetadata() {
+  const site = await getSiteSettings()
+  return {
+    title: site.seoTitle,
+    description: site.seoDescription,
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://eng-moaaz.vercel.app'),
+    robots: { index: true, follow: true },
+    openGraph: { title: site.seoTitle, description: site.seoDescription, type: 'website' },
+  }
 }
 
 const themeScript = `
