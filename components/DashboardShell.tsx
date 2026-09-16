@@ -1,43 +1,125 @@
 'use client'
-import {ReactNode,useEffect,useState} from 'react'; import Link from 'next/link'; import {useRouter} from 'next/navigation'; import {Bell,Home,BookOpen,ClipboardCheck,FileText,Library,CalendarCheck,BarChart3,User,MessageCircle,Menu,LogOut,House} from 'lucide-react'
-const items=[['الرئيسية','/student',Home],['الكورسات','/student/courses',BookOpen],['الدروس','/student/lessons',FileText],['الامتحانات','/student/exams',ClipboardCheck],['الواجبات','/student/assignments',FileText],['الكتب','/student/books',Library],['الحضور','/student/attendance',CalendarCheck],['الدرجات','/student/grades',BarChart3],['التقارير','/student/analytics',BarChart3],['الإشعارات','/student/notifications',Bell],['الملف الشخصي','/student/profile',User],['الدعم','/student/support',MessageCircle]] as const
 
-type Me={name:string;role:string;phone?:string}
-type SiteSettings={brandName?:string;siteName?:string;announcement?:string}
+import { ReactNode, useEffect, useState } from 'react'
+import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
+import { Bell, Home, BookOpen, ClipboardCheck, FileText, Library, CalendarCheck, BarChart3, User, MessageCircle, Menu, LogOut, X, LayoutDashboard } from 'lucide-react'
 
-export default function DashboardShell({children,title}:{children:ReactNode,title:string}){
-  const [open,setOpen]=useState(false); const [user,setUser]=useState<Me|null>(null); const [site,setSite]=useState<SiteSettings>({}); const [checking,setChecking]=useState(true); const router=useRouter()
-  useEffect(()=>{
-    let active=true
-    Promise.all([
-      fetch('/api/auth/me',{cache:'no-store'}).then(async r=>r.ok?r.json():Promise.reject()),
-      fetch('/api/site-settings',{cache:'no-store'}).then(async r=>r.ok?r.json():({settings:{}})).catch(()=>({settings:{}})),
-    ]).then(([me,settings])=>{if(!active)return; if(me.user?.role!=='STUDENT')throw new Error(); setUser(me.user); setSite(settings.settings??{})}).catch(()=>{if(active)router.replace('/login')}).finally(()=>{if(active)setChecking(false)})
-    return()=>{active=false}
-  },[router])
-  async function logout(){await fetch('/api/auth/logout',{method:'POST'});router.replace('/login')}
-  if(checking)return <main className="min-h-screen landing-page grid place-items-center"><div className="card p-8 muted font-bold">جاري تحميل حسابك...</div></main>
-  const brand=site.brandName||'Eng Moaaz Ismail'; const siteName=site.siteName||'المنصة التعليمية'
-  return <main className="min-h-screen landing-page pb-16">
-    {site.announcement&&<div className="site-announcement">{site.announcement}</div>}
-    <header className="site-header"><div className="site-header-inner">
-      <div className="header-brand"><Link href="/student" className="brand-lockup"><img src="/logo.png" className="brand-logo" alt={`شعار ${brand}`}/><div><div className="font-black text-lg text-[var(--primary)]">{brand}</div><div className="text-xs muted">{siteName}</div></div></Link></div>
-      <nav className="main-nav hidden lg:flex"><Link href="/">الرئيسية</Link><Link href="/student/courses" className="active">الكورسات</Link><Link href="/student/lessons">الدروس</Link><Link href="/student/exams">الامتحانات</Link></nav>
-      <div className="header-actions">
-        <button aria-label="فتح القائمة" className="theme-toggle lg:hidden" onClick={()=>setOpen(!open)}><Menu size={18}/></button>
-        <Link href="/student/notifications" className="header-login"><Bell size={17}/><span className="hidden sm:inline">الإشعارات</span></Link>
-        <button onClick={logout} className="header-register"><LogOut size={17}/><span>خروج</span></button>
-        <div className="w-10 h-10 rounded-full bg-[#f0e7fb] text-[var(--primary)] grid place-items-center font-black border border-[#e4d6f0]">{user?.name?.[0]||'ط'}</div>
-      </div>
-    </div></header>
-    <div className="container flex gap-6 py-8">
-      {open&&<button aria-label="إغلاق القائمة" className="fixed inset-0 z-20 bg-black/20 lg:hidden" onClick={()=>setOpen(false)}/>} 
-      <aside className={`${open?'block fixed right-4 left-4 top-24 z-30':'hidden'} lg:block w-64 shrink-0`}><div className="card p-4 lg:sticky lg:top-24">
-        <div className="flex items-center justify-between px-3 pb-4 border-b border-[var(--line)]"><div><div className="text-xs muted font-bold">مساحة الطالب</div><div className="text-2xl font-black text-[var(--primary)]">{title}</div></div><House size={20} className="text-[var(--primary)]"/></div>
-        <div className="pt-3">{items.map(([t,h,Icon])=><Link onClick={()=>setOpen(false)} key={h} href={h} className="flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-[var(--primary-soft)] font-semibold transition"><Icon size={18}/>{t}</Link>)}</div>
-      </div></aside>
-      <section className="flex-1 min-w-0">{children}</section>
-    </div>
-    <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t grid grid-cols-4 p-2 shadow-[0_-8px_24px_rgba(45,25,65,.06)]">{items.slice(0,4).map(([t,h,Icon])=><Link key={h} href={h} className="grid place-items-center text-xs gap-1 py-1 font-bold text-[var(--ink)]"><Icon size={18}/><span>{t}</span></Link>)}</nav>
-  </main>
+const items = [
+  ['الرئيسية', '/student', Home],
+  ['الكورسات', '/student/courses', BookOpen],
+  ['الدروس', '/student/lessons', FileText],
+  ['الامتحانات', '/student/exams', ClipboardCheck],
+  ['الواجبات', '/student/assignments', FileText],
+  ['الكتب', '/student/books', Library],
+  ['الحضور', '/student/attendance', CalendarCheck],
+  ['الدرجات', '/student/grades', BarChart3],
+  ['التقارير', '/student/analytics', BarChart3],
+  ['الإشعارات', '/student/notifications', Bell],
+  ['الملف الشخصي', '/student/profile', User],
+  ['الدعم', '/student/support', MessageCircle],
+] as const
+
+const primaryNav = items.slice(0, 4)
+
+function roleTarget(role?: string) {
+  if (role === 'ADMIN') return '/admin'
+  if (role === 'TEACHER') return '/teacher'
+  if (role === 'PARENT') return '/parent'
+  if (role === 'SUPPORT') return '/support'
+  return '/student'
+}
+
+export default function DashboardShell({ children, title }: { children: ReactNode; title: string }) {
+  const [open, setOpen] = useState(false)
+  const [user, setUser] = useState<{ name?: string; role?: string } | null>(null)
+  const [checking, setChecking] = useState(true)
+  const router = useRouter()
+  const pathname = usePathname()
+
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/auth/me', { cache: 'no-store' })
+      .then(async r => (r.ok ? r.json() : null))
+      .then(d => {
+        if (cancelled) return
+        if (d?.user?.role !== 'STUDENT') throw new Error('UNAUTHORIZED')
+        setUser(d.user)
+      })
+      .catch(() => router.replace('/login'))
+      .finally(() => { if (!cancelled) setChecking(false) })
+    return () => { cancelled = true }
+  }, [router])
+
+  useEffect(() => { setOpen(false) }, [pathname])
+
+  async function logout() {
+    await fetch('/api/auth/logout', { method: 'POST' })
+    router.replace('/login')
+  }
+
+  if (checking) return <main className="student-loading"><div>جاري تحميل حسابك...</div></main>
+
+  return (
+    <>
+      <style>{`
+        .student-shell{min-height:100vh;background:linear-gradient(180deg,#fff 0%,#fbfaff 58%,#fff 100%);color:#24213a;padding-bottom:30px}
+        .student-header{position:sticky;top:0;z-index:60;height:76px;background:rgba(255,255,255,.97);border-bottom:1px solid #eee8f4;box-shadow:0 7px 24px rgba(42,24,65,.07);backdrop-filter:blur(16px)}
+        .student-header-inner{height:100%;width:min(1360px,calc(100% - 32px));margin:auto;display:grid;grid-template-columns:minmax(220px,1fr) auto minmax(260px,1fr);align-items:center;gap:18px}
+        .student-brand{display:flex;align-items:center;gap:10px;min-width:0}.student-brand img{width:48px;height:48px;object-fit:contain;border-radius:13px}.student-brand strong{display:block;color:#6d2fa3;font-size:16px;font-weight:950;white-space:nowrap}.student-brand span{display:block;color:#7b7385;font-size:10px;font-weight:800;margin-top:2px;white-space:nowrap}
+        .student-top-nav{display:flex;align-items:center;justify-content:center;gap:6px}.student-top-nav a{height:42px;padding:0 14px;border-radius:12px;display:inline-flex;align-items:center;font-size:13px;font-weight:900;color:#30263d;white-space:nowrap}.student-top-nav a:hover,.student-top-nav a.active{background:#f3eafa;color:#6d2fa3}
+        .student-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}.student-action{height:42px;border:1px solid #e7dfef;background:#fff;border-radius:12px;padding:0 13px;color:#30263d;display:inline-flex;align-items:center;gap:7px;font:inherit;font-size:12px;font-weight:900}.student-action:hover{border-color:#d3bee4;background:#faf6fd}.student-avatar{width:40px;height:40px;border-radius:50%;background:#f1e8fa;color:#6d2fa3;display:grid;place-items:center;font-weight:950;flex:0 0 40px}.student-menu-button{display:none}
+        .student-layout{width:min(1360px,calc(100% - 32px));margin:auto;display:grid;grid-template-columns:250px minmax(0,1fr);gap:24px;padding:28px 0 0;direction:ltr}.student-sidebar{direction:rtl}.student-sidebar-card{position:sticky;top:100px;background:#fff;border:1px solid #eee8f4;border-radius:22px;padding:12px;box-shadow:0 12px 30px rgba(42,24,65,.06)}.student-sidebar-title{padding:10px 12px 14px;border-bottom:1px solid #eee8f4;margin-bottom:8px;color:#6d2fa3;font-size:20px;font-weight:950}.student-sidebar a{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:12px;color:#383043;font-size:13px;font-weight:850}.student-sidebar a:hover,.student-sidebar a.active{background:#f4ecfa;color:#6d2fa3}.student-content{direction:rtl;min-width:0}.student-loading{min-height:100vh;display:grid;place-items:center;background:#fbfaff;color:#6d2fa3;font-weight:900}
+        .student-mobile-menu{display:none}
+        @media(max-width:1050px){.student-header-inner{grid-template-columns:1fr auto}.student-top-nav{display:none}.student-actions{min-width:0}.student-menu-button{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border:1px solid #e7dfef;border-radius:12px;background:#fff;color:#6d2fa3}.student-layout{display:block;width:min(100%,calc(100% - 24px));padding-top:18px}.student-sidebar{display:none}.student-mobile-menu{position:fixed;top:88px;right:12px;left:12px;z-index:70;background:#fff;border:1px solid #eee8f4;border-radius:18px;box-shadow:0 18px 42px rgba(42,24,65,.14);padding:10px;display:flex;flex-direction:column;gap:3px;max-height:calc(100vh - 170px);overflow:auto}.student-mobile-menu a,.student-mobile-menu button{min-height:44px;padding:0 12px;border-radius:11px;display:flex;align-items:center;gap:10px;border:0;background:transparent;font:inherit;font-size:13px;font-weight:900;color:#383043;text-align:right}.student-mobile-menu a.active,.student-mobile-menu a:hover{background:#f4ecfa;color:#6d2fa3}.student-mobile-menu button{color:#b42318}.student-mobile-menu .mobile-divider{height:1px;background:#eee8f4;margin:5px 0}.student-mobile-bar{position:fixed;bottom:12px;left:12px;right:12px;z-index:80;background:rgba(255,255,255,.97);border:1px solid #eee8f4;border-radius:18px;box-shadow:0 12px 30px rgba(42,24,65,.13);display:grid;grid-template-columns:repeat(4,1fr);padding:7px}.student-mobile-bar a{display:grid;place-items:center;gap:4px;padding:7px 3px;border-radius:12px;font-size:10px;font-weight:900;color:#5e5668}.student-mobile-bar a.active{background:#f3eafa;color:#6d2fa3}.student-shell{padding-bottom:98px}}
+        @media(max-width:560px){.student-header{height:66px}.student-header-inner{width:calc(100% - 14px);gap:6px}.student-brand img{width:40px;height:40px}.student-brand strong{font-size:14px}.student-brand span{display:none}.student-actions{gap:5px}.student-action{width:40px;height:40px;padding:0;justify-content:center}.student-action span{display:none}.student-avatar{width:38px;height:38px;flex-basis:38px}.student-layout{width:calc(100% - 14px)}.student-mobile-menu{top:75px;right:7px;left:7px}}
+      `}</style>
+
+      <main className="student-shell">
+        <header className="student-header">
+          <div className="student-header-inner">
+            <Link className="student-brand" href="/student">
+              <img src="/logo.png" alt="برمجها معاذ" />
+              <div><strong>برمجها معاذ</strong><span>منصتك التعليمية</span></div>
+            </Link>
+            <nav className="student-top-nav" aria-label="التنقل الرئيسي">
+              {primaryNav.map(([label, href]) => <Link key={href} className={pathname === href ? 'active' : ''} href={href}>{label}</Link>)}
+            </nav>
+            <div className="student-actions">
+              <Link className="student-action" href="/"><Home size={16}/><span>الرئيسية</span></Link>
+              <Link className="student-action" href="/student/notifications"><Bell size={16}/><span>الإشعارات</span></Link>
+              <button className="student-menu-button" onClick={() => setOpen(v => !v)} aria-label="فتح القائمة">{open ? <X size={18}/> : <Menu size={18}/>}</button>
+              <Link className="student-avatar" href="/student/profile" aria-label="الملف الشخصي">{user?.name?.[0] || 'ط'}</Link>
+            </div>
+          </div>
+        </header>
+
+        {open && <>
+          <button aria-label="إغلاق القائمة" className="fixed inset-0 z-[65] bg-black/15" onClick={() => setOpen(false)} />
+          <div className="student-mobile-menu">
+            {items.map(([label, href, Icon]) => <Link key={href} className={pathname === href ? 'active' : ''} href={href} onClick={() => setOpen(false)}><Icon size={17}/>{label}</Link>)}
+            <div className="mobile-divider" />
+            <Link href="/"><Home size={17}/> الصفحة الرئيسية</Link>
+            <Link href="/student/profile"><User size={17}/> {user?.name || 'الملف الشخصي'}</Link>
+            <Link href={roleTarget(user?.role)}><LayoutDashboard size={17}/> لوحة الطالب</Link>
+            <button onClick={logout}><LogOut size={17}/> تسجيل الخروج</button>
+          </div>
+        </>}
+
+        <div className="student-layout">
+          <aside className="student-sidebar">
+            <div className="student-sidebar-card">
+              <div className="student-sidebar-title">{title}</div>
+              {items.map(([label, href, Icon]) => <Link key={href} className={pathname === href ? 'active' : ''} href={href}><Icon size={17}/>{label}</Link>)}
+            </div>
+          </aside>
+          <section className="student-content">{children}</section>
+        </div>
+
+        <nav className="student-mobile-bar" aria-label="تنقل سريع">
+          {primaryNav.map(([label, href, Icon]) => <Link key={href} className={pathname === href ? 'active' : ''} href={href}><Icon size={17}/><span>{label}</span></Link>)}
+        </nav>
+      </main>
+    </>
+  )
 }
