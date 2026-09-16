@@ -1,5 +1,6 @@
 import './globals.css'
 import { ReactNode } from 'react'
+import WhatsAppContact from '@/components/WhatsAppContact'
 
 export const metadata = {
   title: 'Eng Moaaz Ismail | المنصة التعليمية',
@@ -16,7 +17,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="stylesheet" href="/stages-filter.css?v=1" />
         <style>{`@font-face{font-family:'Rabie';src:url('/Rabie-Extralight.ttf?v=2') format('truetype');font-style:normal;font-weight:200 900;font-display:swap}`}</style>
       </head>
-      <body style={{fontFamily:"'Rabie', Arial, 'Noto Sans Arabic', sans-serif"}}>{children}</body>
+      <body style={{fontFamily:"'Rabie', Arial, 'Noto Sans Arabic', sans-serif"}}>{children}<WhatsAppContact /></body>
     </html>
   )
 }
