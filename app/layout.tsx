@@ -7,5 +7,5 @@ export const metadata = {
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  return <html lang="ar" dir="rtl"><body>{children}</body></html>
+  return <html lang="ar" dir="rtl"><head><link rel="stylesheet" href="/hero-animations.css" /></head><body>{children}</body></html>
 }
