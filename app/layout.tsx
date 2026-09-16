@@ -11,7 +11,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="ar" dir="rtl">
       <head>
         <link rel="stylesheet" href="/hero-animations.css" />
-        <style>{`@font-face{font-family:'Rabie';src:url('/Rabie-Extralight.ttf') format('truetype');font-style:normal;font-weight:200;font-display:swap}`}</style>
+        <link rel="stylesheet" href="/rabie-force.css?v=2" />
+        <style>{`@font-face{font-family:'Rabie';src:url('/Rabie-Extralight.ttf?v=2') format('truetype');font-style:normal;font-weight:200 900;font-display:swap}`}</style>
       </head>
       <body style={{fontFamily:"'Rabie', Arial, 'Noto Sans Arabic', sans-serif"}}>{children}</body>
     </html>
