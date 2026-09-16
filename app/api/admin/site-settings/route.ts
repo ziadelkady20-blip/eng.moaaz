@@ -20,6 +20,8 @@ const schema = z.object({
   whatsapp: z.string().max(30),
   seoTitle: z.string().min(4).max(180),
   seoDescription: z.string().max(300),
+  metaPixelId: z.string().regex(/^[0-9]*$/, 'Meta Pixel ID غير صحيح'),
+  googleAnalyticsId: z.string().regex(/^(|G-[A-Z0-9]+)$/i, 'Google Analytics ID غير صحيح'),
 })
 
 export async function GET() {
