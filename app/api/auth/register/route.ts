@@ -5,15 +5,17 @@ import { db } from '@/lib/db'
 import { hashPassword, normalizePhone, setSession } from '@/lib/auth'
 import { Role, StudyType } from '@prisma/client'
 
+const phone = z.preprocess(value => typeof value === 'string' ? normalizePhone(value) : value, z.string().regex(/^01\d{9}$/))
+
 const schema = z.object({
   name: z.string().trim().min(3).max(100),
-  phone: z.string().trim().regex(/^01\d{9}$/),
+  phone,
   password: z.string().min(8).max(128),
   gradeId: z.string().optional(),
   governorateId: z.string().optional(),
   schoolId: z.string().optional(),
   studyType: z.enum(['ONLINE', 'CENTER', 'HYBRID']).default('ONLINE'),
-  guardianPhone: z.string().trim().regex(/^01\d{9}$/).optional(),
+  guardianPhone: z.preprocess(value => value ? normalizePhone(String(value)) : undefined, z.string().regex(/^01\d{9}$/).optional()),
 })
 
 export async function POST(req: Request) {
@@ -27,12 +29,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const raw = schema.parse(await req.json())
-    const body = {
-      ...raw,
-      phone: normalizePhone(raw.phone),
-      guardianPhone: raw.guardianPhone ? normalizePhone(raw.guardianPhone) : undefined,
-    }
+    const body = schema.parse(await req.json())
     const exists = await db.user.findUnique({ where: { phone: body.phone } })
     if (exists) return NextResponse.json({ error: 'رقم الهاتف مسجل بالفعل' }, { status: 409 })
 
