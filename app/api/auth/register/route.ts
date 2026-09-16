@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { rateLimit } from '@/lib/rate-limit'
 import { z } from 'zod'
 import { db } from '@/lib/db'
-import { hashPassword, setSession } from '@/lib/auth'
+import { hashPassword, normalizePhone, setSession } from '@/lib/auth'
 import { Role, StudyType } from '@prisma/client'
 
 const schema = z.object({
@@ -12,17 +12,27 @@ const schema = z.object({
   gradeId: z.string().optional(),
   governorateId: z.string().optional(),
   schoolId: z.string().optional(),
-  studyType: z.enum(['ONLINE','CENTER','HYBRID']).default('ONLINE'),
+  studyType: z.enum(['ONLINE', 'CENTER', 'HYBRID']).default('ONLINE'),
   guardianPhone: z.string().trim().regex(/^01\d{9}$/).optional(),
 })
 
 export async function POST(req: Request) {
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
   const rl = rateLimit(`register:${ip}`, 5, 60_000)
-  if (!rl.ok) return NextResponse.json({ error: 'محاولات كثيرة. حاول بعد دقيقة.' }, { status: 429, headers: { 'Retry-After': '60' } })
+  if (!rl.ok) {
+    return NextResponse.json({ error: 'محاولات كثيرة. حاول بعد دقيقة.' }, {
+      status: 429,
+      headers: { 'Retry-After': '60' },
+    })
+  }
 
   try {
-    const body = schema.parse(await req.json())
+    const raw = schema.parse(await req.json())
+    const body = {
+      ...raw,
+      phone: normalizePhone(raw.phone),
+      guardianPhone: raw.guardianPhone ? normalizePhone(raw.guardianPhone) : undefined,
+    }
     const exists = await db.user.findUnique({ where: { phone: body.phone } })
     if (exists) return NextResponse.json({ error: 'رقم الهاتف مسجل بالفعل' }, { status: 409 })
 
@@ -35,7 +45,12 @@ export async function POST(req: Request) {
 
     let schoolId: string | undefined
     if (body.schoolId) {
-      const school = await db.school.findFirst({ where: { OR: [{ id: body.schoolId }, { name: body.schoolId }] } })
+      const school = await db.school.findFirst({
+        where: {
+          OR: [{ id: body.schoolId }, { name: body.schoolId }],
+          ...(governorate?.id ? { governorateId: governorate.id } : {}),
+        },
+      })
       if (school) schoolId = school.id
     }
 
@@ -59,8 +74,17 @@ export async function POST(req: Request) {
     })
 
     await setSession(user.id, user.role)
-    return NextResponse.json({ user: { id: user.id, name: user.name, role: user.role, student: user.student } })
+    return NextResponse.json({
+      user: { id: user.id, name: user.name, role: user.role, student: user.student },
+    }, { status: 201 })
   } catch (e) {
-    return NextResponse.json({ error: e instanceof z.ZodError ? 'بيانات التسجيل غير صحيحة' : 'تعذر إنشاء الحساب' }, { status: 400 })
+    if (e instanceof z.ZodError) {
+      return NextResponse.json({ error: 'بيانات التسجيل غير صحيحة' }, { status: 400 })
+    }
+    if ((e as { code?: string })?.code === 'P2002') {
+      return NextResponse.json({ error: 'رقم الهاتف مسجل بالفعل' }, { status: 409 })
+    }
+    console.error('REGISTER_ERROR', e)
+    return NextResponse.json({ error: 'حدث خطأ أثناء إنشاء الحساب' }, { status: 500 })
   }
 }
