@@ -1,9 +1,14 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { getCurrentUser } from '@/lib/auth'
+
 export async function GET(){
- const user=await getCurrentUser();
- const courses=await db.course.findMany({include:{grade:true,subject:true,teacher:{include:{user:true}},modules:{include:{lessons:true},orderBy:{order:'asc'}}},orderBy:{createdAt:'desc'}})
+ const user=await getCurrentUser()
+ const courses=await db.course.findMany({
+   where:{published:true},
+   include:{grade:true,subject:true,teacher:{include:{user:true}},modules:{include:{lessons:true},orderBy:{order:'asc'}}},
+   orderBy:{createdAt:'desc'}
+ })
  const student=user?.student
  const enrolled=student?await db.courseEnrollment.findMany({where:{studentId:student.id},select:{courseId:true}}):[]
  const ids=new Set(enrolled.map(x=>x.courseId))
