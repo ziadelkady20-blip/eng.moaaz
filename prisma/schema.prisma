@@ -305,7 +305,7 @@ model Assignment {
   dueAt       DateTime
   courseId    String?
   submissions AssignmentSubmission[]
-  course      Course?               @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  course      Course?                @relation(fields: [courseId], references: [id], onDelete: SetNull)
 }
 
 model AssignmentSubmission {
@@ -440,7 +440,7 @@ model Order {
 }
 
 model Payment {
-  id            String        @id
+  id            String        @id @default(cuid())
   orderId       String
   status        PaymentStatus @default(PENDING)
   method        String?
@@ -572,4 +572,4 @@ model PaymentWebhookEvent {
   receivedAt DateTime @default(now())
   status     String
   orderId    String?
-} 
+}
