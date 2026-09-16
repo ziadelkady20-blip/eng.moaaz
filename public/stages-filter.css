@@ -1,0 +1,1 @@
+.grade-cards{grid-template-columns:repeat(2,minmax(0,1fr)) !important;max-width:860px;margin-inline:auto}.grade-card.tone-violet{display:none !important}@media(max-width:800px){.grade-cards{grid-template-columns:1fr !important;max-width:520px}}
