@@ -4,6 +4,7 @@ import WhatsAppContact from '@/components/WhatsAppContact'
 import ScrollProgress from '@/components/ScrollProgress'
 import MarketingScripts from '@/components/MarketingScripts'
 import SiteContentSync from '@/components/SiteContentSync'
+import HomeAuthHeader from '@/components/HomeAuthHeader'
 import { getSiteSettings } from '@/lib/site-settings'
 
 export const dynamic = 'force-dynamic'
@@ -71,7 +72,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="stylesheet" href="/dark-mode-header-fix.css?v=3" />
         <style>{`@font-face{font-family:'Rabie';src:url('/Rabie-Extralight.ttf?v=2') format('truetype');font-style:normal;font-weight:200 900;font-display:swap}`}</style>
       </head>
-      <body style={{fontFamily:"'Rabie', Arial, 'Noto Sans Arabic', sans-serif"}}><ScrollProgress />{children}<MarketingScripts /><SiteContentSync /><WhatsAppContact /><script dangerouslySetInnerHTML={{__html:themeScript}} /></body>
+      <body style={{fontFamily:"'Rabie', Arial, 'Noto Sans Arabic', sans-serif"}}><HomeAuthHeader /><ScrollProgress />{children}<MarketingScripts /><SiteContentSync /><WhatsAppContact /><script dangerouslySetInnerHTML={{__html:themeScript}} /></body>
     </html>
   )
 }
