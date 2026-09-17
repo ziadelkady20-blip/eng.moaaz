@@ -1,0 +1,73 @@
+/* Primary platform mark: use the new black combined logo everywhere the app shows the brand mark. */
+.home-auth-brand img,
+.student-brand img,
+.auth-brand img,
+.auth-mini-brand img,
+.brand-lockup img {
+  content: url('/brand-logo-black.svg');
+  filter: none !important;
+}
+
+.home-auth-brand,
+.student-brand,
+.auth-brand,
+.auth-mini-brand {
+  flex-shrink: 0;
+}
+
+.home-auth-brand {
+  min-width: 62px !important;
+}
+.home-auth-brand img {
+  width: 64px !important;
+  height: 52px !important;
+  object-fit: contain !important;
+  border-radius: 0 !important;
+}
+.home-auth-brand strong,
+.home-auth-brand span,
+.student-brand strong,
+.student-brand span,
+.auth-brand > div,
+.auth-mini-brand strong {
+  display: none !important;
+}
+
+.student-brand img {
+  width: 70px !important;
+  height: 56px !important;
+  object-fit: contain !important;
+  border-radius: 0 !important;
+}
+
+.auth-brand img {
+  width: 150px !important;
+  height: 100px !important;
+  object-fit: contain !important;
+  background: #fff;
+  padding: 8px;
+  border-radius: 16px !important;
+}
+
+.auth-mini-brand img {
+  width: 120px !important;
+  height: 78px !important;
+  object-fit: contain !important;
+  border-radius: 0 !important;
+  background: #fff;
+  padding: 5px;
+}
+
+.brand-lockup img {
+  width: 88px !important;
+  height: 58px !important;
+  object-fit: contain !important;
+  border-radius: 0 !important;
+}
+
+@media (max-width: 560px) {
+  .home-auth-brand img { width: 58px !important; height: 48px !important; }
+  .student-brand img { width: 60px !important; height: 50px !important; }
+  .auth-brand img { width: 132px !important; height: 88px !important; }
+  .auth-mini-brand img { width: 100px !important; height: 66px !important; }
+}
