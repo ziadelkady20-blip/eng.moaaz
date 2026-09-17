@@ -70,6 +70,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="stylesheet" href="/scroll-progress.css?v=1" />
         <link rel="stylesheet" href="/books-package.css?v=1" />
         <link rel="stylesheet" href="/dark-mode-header-fix.css?v=3" />
+        <link rel="stylesheet" href="/student-loading.css?v=1" />
         <style>{`@font-face{font-family:'Rabie';src:url('/Rabie-Extralight.ttf?v=2') format('truetype');font-style:normal;font-weight:200 900;font-display:swap}`}</style>
       </head>
       <body style={{fontFamily:"'Rabie', Arial, 'Noto Sans Arabic', sans-serif"}}><HomeAuthHeader /><ScrollProgress />{children}<MarketingScripts /><SiteContentSync /><WhatsAppContact /><script dangerouslySetInnerHTML={{__html:themeScript}} /></body>
