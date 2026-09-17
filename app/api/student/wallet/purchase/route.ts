@@ -33,6 +33,7 @@ export async function POST(req:Request){
       await tx.$executeRaw(Prisma.sql`INSERT INTO "WalletTransaction" ("id","walletId","type","amount","balanceAfter","description","reference") VALUES (${transactionId},${walletId},'PURCHASE',${-price},${newBalance},${`شراء كورس: ${course.title}`},${`purchase_${purchaseId}`})`)
       await tx.$executeRaw(Prisma.sql`INSERT INTO "ContentPurchase" ("id","studentId","courseId","price","walletTransactionId") VALUES (${purchaseId},${user.student!.id},${courseId},${price},${transactionId})`)
       await tx.$executeRaw(Prisma.sql`INSERT INTO "CourseEnrollment" ("studentId","courseId") VALUES (${user.student!.id},${courseId}) ON CONFLICT ("studentId","courseId") DO NOTHING`)
+      await tx.$executeRaw(Prisma.sql`INSERT INTO "Notification" ("id","userId","title","body") VALUES (${randomUUID()},${user.id},'تم شراء الكورس','تم خصم ${price} ج.م وفتح كورس ${course.title} على حسابك بشكل دائم.')`)
       return {already:false,balance:newBalance,title:course.title}
     })
     return NextResponse.json({success:true,...result,message:result.already?'الكورس مفتوح بالفعل على حسابك.':'تم شراء الكورس وفتح المحتوى بشكل دائم.'})
