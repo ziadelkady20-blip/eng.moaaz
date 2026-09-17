@@ -13,15 +13,22 @@ export async function POST(req:Request){
     const courseId=typeof body?.courseId==='string'?body.courseId:''
     if(!courseId) return NextResponse.json({error:'الكورس غير محدد'},{status:400})
     const result=await db.$transaction(async tx=>{
+      const studentRows=await tx.$queryRaw<any[]>(Prisma.sql`
+        SELECT "id","gradeId" FROM "Student" WHERE "userId"=${user.id} LIMIT 1
+      `)
+      const student=studentRows[0]
+      if(!student) throw new Error('بيانات الطالب غير موجودة')
+      if(!student.gradeId) throw new Error('حساب الطالب غير مرتبط بصف دراسي')
+
       const courseRows=await tx.$queryRaw<any[]>(Prisma.sql`SELECT "id","title","price","gradeId" FROM "Course" WHERE "id"=${courseId} AND "published"=true LIMIT 1`)
       const course=courseRows[0]
       if(!course) throw new Error('الكورس غير متاح')
-      if(!user.student!.gradeId||course.gradeId!==user.student!.gradeId) throw new Error('هذا المحتوى غير متاح لصفك')
-      const owned=await tx.$queryRaw<any[]>(Prisma.sql`SELECT "id" FROM "ContentPurchase" WHERE "studentId"=${user.student!.id} AND "courseId"=${courseId} LIMIT 1`)
+      if(course.gradeId!==student.gradeId) throw new Error('هذا المحتوى غير متاح لصفك')
+      const owned=await tx.$queryRaw<any[]>(Prisma.sql`SELECT "id" FROM "ContentPurchase" WHERE "studentId"=${student.id} AND "courseId"=${courseId} LIMIT 1`)
       if(owned.length) return {already:true,balance:null,title:course.title}
-      const existingEnrollment=await tx.$queryRaw<any[]>(Prisma.sql`SELECT "courseId" FROM "CourseEnrollment" WHERE "studentId"=${user.student!.id} AND "courseId"=${courseId} LIMIT 1`)
+      const existingEnrollment=await tx.$queryRaw<any[]>(Prisma.sql`SELECT "courseId" FROM "CourseEnrollment" WHERE "studentId"=${student.id} AND "courseId"=${courseId} LIMIT 1`)
       if(existingEnrollment.length) return {already:true,balance:null,title:course.title}
-      const walletId=await ensureWallet(user.student!.id,tx)
+      const walletId=await ensureWallet(student.id,tx)
       const walletRows=await tx.$queryRaw<any[]>(Prisma.sql`SELECT "balance" FROM "Wallet" WHERE "id"=${walletId} FOR UPDATE`)
       const balance=money(walletRows[0]?.balance||0)
       const price=money(course.price)
@@ -31,8 +38,8 @@ export async function POST(req:Request){
       const purchaseId=randomUUID()
       await tx.$executeRaw(Prisma.sql`UPDATE "Wallet" SET "balance"=${newBalance},"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=${walletId}`)
       await tx.$executeRaw(Prisma.sql`INSERT INTO "WalletTransaction" ("id","walletId","type","amount","balanceAfter","description","reference") VALUES (${transactionId},${walletId},'PURCHASE',${-price},${newBalance},${`شراء كورس: ${course.title}`},${`purchase_${purchaseId}`})`)
-      await tx.$executeRaw(Prisma.sql`INSERT INTO "ContentPurchase" ("id","studentId","courseId","price","walletTransactionId") VALUES (${purchaseId},${user.student!.id},${courseId},${price},${transactionId})`)
-      await tx.$executeRaw(Prisma.sql`INSERT INTO "CourseEnrollment" ("studentId","courseId") VALUES (${user.student!.id},${courseId}) ON CONFLICT ("studentId","courseId") DO NOTHING`)
+      await tx.$executeRaw(Prisma.sql`INSERT INTO "ContentPurchase" ("id","studentId","courseId","price","walletTransactionId") VALUES (${purchaseId},${student.id},${courseId},${price},${transactionId})`)
+      await tx.$executeRaw(Prisma.sql`INSERT INTO "CourseEnrollment" ("studentId","courseId") VALUES (${student.id},${courseId}) ON CONFLICT ("studentId","courseId") DO NOTHING`)
       return {already:false,balance:newBalance,title:course.title}
     })
     return NextResponse.json({success:true,...result,message:result.already?'الكورس مفتوح بالفعل على حسابك.':'تم شراء الكورس وفتح المحتوى بشكل دائم.'})
