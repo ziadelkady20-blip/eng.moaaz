@@ -11,7 +11,8 @@ const methods=new Set(['INSTAPAY','VODAFONE_CASH','ETISALAT_CASH','ORANGE_CASH',
 export async function POST(req:Request){
   try{
     const user=await requireRole(['STUDENT'])
-    if(!user.student) return NextResponse.json({error:'غير مصرح'},{status:401})
+    const student=user.student ?? await db.student.findUnique({where:{userId:user.id}})
+    if(!student) return NextResponse.json({error:'حساب الطالب غير مكتمل، تواصل مع الدعم'},{status:422})
     const form=await req.formData()
     const amount=Number(form.get('amount'))
     const method=String(form.get('method')||'')
@@ -25,9 +26,9 @@ export async function POST(req:Request){
     if(proof.size>MAX_PROOF_BYTES) return NextResponse.json({error:'حجم الصورة يجب ألا يتجاوز 2MB'},{status:400})
     const bytes=Buffer.from(await proof.arrayBuffer())
     const proofData=`data:${proof.type};base64,${bytes.toString('base64')}`
-    const walletId=await ensureWallet(user.student.id)
+    const walletId=await ensureWallet(student.id)
     const id=randomUUID()
     await db.$executeRaw(Prisma.sql`INSERT INTO "RechargeRequest" ("id","walletId","amount","method","senderPhone","proofData","proofMime") VALUES (${id},${walletId},${amount},${method},${senderPhone},${proofData},${proof.type})`)
     return NextResponse.json({id,status:'PENDING',message:'تم إرسال طلب الشحن للمراجعة.'},{status:201})
-  }catch(e){ console.error('RECHARGE_CREATE_ERROR',e); return NextResponse.json({error:'تعذر إرسال طلب الشحن'},{status:500}) }
+  }catch(e){ console.error('RECHARGE_CREATE_ERROR',e); return NextResponse.json({error:'تعذر إرسال طلب الشحن، حاول مرة أخرى'},{status:500}) }
 }
