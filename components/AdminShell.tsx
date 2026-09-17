@@ -2,7 +2,7 @@
 import {ReactNode,useEffect,useState} from 'react';
 import Link from 'next/link'; import {useRouter} from 'next/navigation';
 import {LayoutDashboard,BookOpen,Wallet,Users,Settings,ShieldCheck,Globe,LogOut,Menu} from 'lucide-react'
-const items=[['الرئيسية','/admin',LayoutDashboard],['الكورسات والفيديوهات','/admin/courses',BookOpen],['المدفوعات والحجوزات','/admin/payments',Wallet],['المستخدمون','/admin/users',Users],['الإعدادات','/admin/settings',Settings]] as const
+const items=[['الرئيسية','/admin',LayoutDashboard],['الكورسات والفيديوهات','/admin/courses',BookOpen],['المدفوعات والحجوزات','/admin/payments',Wallet],['محفظة الطلاب','/admin/wallet',Wallet],['المستخدمون','/admin/users',Users],['الإعدادات','/admin/settings',Settings]] as const
 export default function AdminShell({children}:{children:ReactNode}){
  const [open,setOpen]=useState(false); const [user,setUser]=useState<any>(null); const router=useRouter();
  useEffect(()=>{fetch('/api/auth/me').then(r=>r.ok?r.json():Promise.reject()).then(d=>{if(d.user?.role!=='ADMIN')throw new Error();setUser(d.user)}).catch(()=>router.replace('/login'))},[router]);
