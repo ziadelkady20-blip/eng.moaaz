@@ -13,22 +13,24 @@ export default function Payments(){
 
   async function load(){
     setLoading(true); setError('')
+    const errors:string[]=[]
     try{
-      const [paymentsRes,walletRes]=await Promise.all([
-        fetch('/api/admin/payments?ts='+Date.now(),{cache:'no-store'}),
-        fetch('/api/admin/wallet/recharges?ts='+Date.now(),{cache:'no-store',headers:{'Cache-Control':'no-cache'}}),
-      ])
-      const payments=await paymentsRes.json()
-      const wallet=await walletRes.json()
-      if(!paymentsRes.ok) throw new Error(payments.error||'تعذر تحميل المدفوعات')
-      if(!walletRes.ok) throw new Error(wallet.error||'تعذر تحميل طلبات شحن المحافظ')
-      setOrders(payments.orders||[])
-      setWalletRequests(wallet.requests||[])
-    }catch(e:any){setError(e.message||'حدث خطأ أثناء التحميل')}
-    finally{setLoading(false)}
+      const r=await fetch('/api/admin/payments?ts='+Date.now(),{cache:'no-store'})
+      const d=await r.json()
+      if(!r.ok) errors.push(d.error||'تعذر تحميل المدفوعات القديمة')
+      else setOrders(d.orders||[])
+    }catch{errors.push('تعذر الاتصال بمدفوعات الحجوزات')}
+    try{
+      const r=await fetch('/api/admin/wallet/recharges?ts='+Date.now(),{cache:'no-store',headers:{'Cache-Control':'no-cache'}})
+      const d=await r.json()
+      if(!r.ok) errors.push(d.error||'تعذر تحميل طلبات شحن المحافظ')
+      else setWalletRequests(d.requests||[])
+    }catch{errors.push('تعذر الاتصال بطلبات شحن المحافظ')}
+    if(errors.length) setError(errors.join(' — '))
+    setLoading(false)
   }
 
-  useEffect(()=>{load()},[])
+  useEffect(()=>{load();const timer=setInterval(load,10000);return()=>clearInterval(timer)},[])
 
   async function act(id:string,kind:string){
     setBusy(id)
@@ -44,9 +46,7 @@ export default function Payments(){
   async function actWallet(id:string,action:'APPROVE'|'REJECT'){
     setBusy(id)
     try{
-      const r=await fetch(`/api/admin/wallet/recharges/${id}`,{
-        method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action})
-      })
+      const r=await fetch(`/api/admin/wallet/recharges/${id}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action})})
       const d=await r.json()
       if(!r.ok) throw new Error(d.error||'تعذر تنفيذ طلب الشحن')
       await load()
@@ -69,7 +69,7 @@ export default function Payments(){
 
     <section>
       <h2 className="text-xl font-black mb-4">المدفوعات والحجوزات القديمة</h2>
-      <div className="space-y-4">{orders.map(o=>{const p=o.payments[0];return <div key={o.id} className="card p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4"><div><div className="font-black text-lg">{o.student.user.name} — {o.course.title}</div><div className="muted text-sm mt-1">{o.student.user.phone} • {o.amount} ج.م • {p?.method||'دفع يدوي'}</div>{o.discount>0&&<div className="text-sm mt-1">خصم: {o.discount} ج.م {o.couponCode?`(${o.couponCode})`:''}</div>}{p?.reference&&<div className="text-sm mt-1">مرجع الدفع: {p.reference}</div>}</div><div className="flex flex-wrap items-center gap-2"><span className="badge">{o.status==='CONFIRMED'?'مؤكد':o.status==='CANCELLED'?'ملغي':'في الانتظار'}</span>{o.status==='PENDING'&&<><button disabled={busy===p.id} onClick={()=>act(p.id,'confirm')} className="btn btn-primary">تأكيد وفتح المحتوى</button><button disabled={busy===p.id} onClick={()=>act(p.id,'reject')} className="btn btn-secondary">رفض</button></>}{o.status==='CONFIRMED'&&<button disabled={busy===p.id} onClick={()=>act(p.id,'refund')} className="btn btn-secondary">استرداد وإغلاق المحتوى</button>}</div></div>})}{!orders.length&&<div className="card p-10 text-center muted">لا توجد حجوزات حتى الآن.</div>}</div>
+      <div className="space-y-4">{orders.map(o=>{const p=o.payments[0];return <div key={o.id} className="card p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4"><div><div className="font-black text-lg">{o.student.user.name} — {o.course.title}</div><div className="muted text-sm mt-1">{o.student.user.phone} • {o.amount} ج.م • {p?.method||'دفع يدوي'}</div>{o.discount>0&&<div className="text-sm mt-1">خصم: {o.discount} ج.م {o.couponCode?`(${o.couponCode})`:''}</div>}{p?.reference&&<div className="text-sm mt-1">مرجع الدفع: {p.reference}</div>}</div><div className="flex flex-wrap items-center gap-2"><span className="badge">{o.status==='CONFIRMED'?'مؤكد':o.status==='CANCELLED'?'ملغي':'في الانتظار'}</span>{o.status==='PENDING'&&p&&<><button disabled={busy===p.id} onClick={()=>act(p.id,'confirm')} className="btn btn-primary">تأكيد وفتح المحتوى</button><button disabled={busy===p.id} onClick={()=>act(p.id,'reject')} className="btn btn-secondary">رفض</button></>}{o.status==='CONFIRMED'&&p&&<button disabled={busy===p.id} onClick={()=>act(p.id,'refund')} className="btn btn-secondary">استرداد وإغلاق المحتوى</button>}</div></div>})}{!orders.length&&<div className="card p-10 text-center muted">لا توجد حجوزات حتى الآن.</div>}</div>
     </section>
   </AdminShell>
 }
