@@ -41,7 +41,7 @@ export async function GET(){
         const ps=lessonIds.map(id=>progressByLesson.get(id)).filter(Boolean) as Array<{watchedPct:number;completed:boolean}>
         const progressPct=lessonIds.length?Math.round(ps.reduce((sum,p)=>sum+p.watchedPct,0)/lessonIds.length):0
         const completedLessons=ps.filter(p=>p.completed).length
-        return {id:c.id,title:c.title,description:c.description,price:Number(c.price),grade:c.grade.name,subject:c.subject.name,teacher:c.teacher.user.name,lessons:lessonIds.length,enrolled:enrolledIds.has(c.id),progress:progressPct,completedLessons}
+        return {id:c.id,title:c.title,description:c.description,coverUrl:c.coverUrl,price:Number(c.price),grade:c.grade.name,subject:c.subject.name,teacher:c.teacher.user.name,lessons:lessonIds.length,enrolled:enrolledIds.has(c.id),progress:progressPct,completedLessons}
       })
     })
   }catch(e){ console.error('COURSES_GET_ERROR',e); return NextResponse.json({error:'تعذر تحميل الكورسات'},{status:500}) }
