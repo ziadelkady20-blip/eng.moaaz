@@ -5,7 +5,6 @@ import ScrollProgress from '@/components/ScrollProgress'
 import MarketingScripts from '@/components/MarketingScripts'
 import SiteContentSync from '@/components/SiteContentSync'
 import HomeAuthHeader from '@/components/HomeAuthHeader'
-import StudentSessionProvider from '@/components/StudentSessionProvider'
 import { getSiteSettings } from '@/lib/site-settings'
 
 export const dynamic = 'force-dynamic'
@@ -21,5 +20,5 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return <html lang="ar" dir="rtl"><head>
     <link rel="stylesheet" href="/hero-animations.css" /><link rel="stylesheet" href="/rabie-force.css?v=2" /><link rel="stylesheet" href="/header-pill.css?v=1" /><link rel="stylesheet" href="/stages-filter.css?v=1" /><link rel="stylesheet" href="/scroll-progress.css?v=1" /><link rel="stylesheet" href="/books-package.css?v=1" /><link rel="stylesheet" href="/dark-mode-header-fix.css?v=3" /><link rel="stylesheet" href="/student-loading.css?v=1" />
     <style>{`@font-face{font-family:'Rabie';src:url('/Rabie-Extralight.ttf?v=2') format('truetype');font-style:normal;font-weight:200 900;font-display:swap}`}</style>
-  </head><body style={{fontFamily:"'Rabie', Arial, 'Noto Sans Arabic', sans-serif"}}><StudentSessionProvider><HomeAuthHeader/><ScrollProgress/>{children}<MarketingScripts/><SiteContentSync/><WhatsAppContact/></StudentSessionProvider><script dangerouslySetInnerHTML={{__html:themeScript}}/></body></html>
+  </head><body style={{fontFamily:"'Rabie', Arial, 'Noto Sans Arabic', sans-serif"}}><HomeAuthHeader/><ScrollProgress/>{children}<MarketingScripts/><SiteContentSync/><WhatsAppContact/><script dangerouslySetInnerHTML={{__html:themeScript}}/></body></html>
 }
