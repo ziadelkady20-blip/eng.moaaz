@@ -1,3 +1,23 @@
-import {NextResponse} from 'next/server'; import {db} from '@/lib/db'; import {requireRole} from '@/lib/auth'; import {z} from 'zod'
-export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){try{await requireRole(['ADMIN']);const {id}=await params;const d=z.object({title:z.string().min(2).optional(),description:z.string().optional(),price:z.coerce.number().min(0).optional(),published:z.boolean().optional()}).parse(await req.json());const course=await db.course.update({where:{id},data:d});return NextResponse.json({course})}catch{return NextResponse.json({error:'تعذر تحديث الكورس'},{status:400})}}
-export async function DELETE(_:Request,{params}:{params:Promise<{id:string}>}){try{await requireRole(['ADMIN']);const {id}=await params;await db.course.delete({where:{id}});return NextResponse.json({ok:true})}catch{return NextResponse.json({error:'تعذر حذف الكورس'},{status:400})}}
+import {NextResponse} from 'next/server'
+import {db} from '@/lib/db'
+import {requireRole} from '@/lib/auth'
+
+export async function DELETE(_:Request,{params}:{params:Promise<{id:string}>}){
+  try{
+    await requireRole(['ADMIN'])
+    const {id}=await params
+    const course=await db.course.findUnique({where:{id},include:{modules:{include:{lessons:{select:{id:true,videoId:true}}}}}})
+    if(!course)return NextResponse.json({error:'الكورس غير موجود'},{status:404})
+    const lessonIds=course.modules.flatMap(m=>m.lessons.map(l=>l.id))
+    const videoIds=course.modules.flatMap(m=>m.lessons.map(l=>l.videoId).filter(Boolean) as string[])
+    await db.$transaction(async tx=>{
+      if(lessonIds.length) await tx.lesson.updateMany({where:{id:{in:lessonIds}},data:{videoId:null}})
+      if(videoIds.length) await tx.video.deleteMany({where:{id:{in:videoIds}}})
+      await tx.course.delete({where:{id}})
+    })
+    return NextResponse.json({ok:true})
+  }catch(e){
+    console.error('ADMIN_COURSE_DELETE_ERROR',e)
+    return NextResponse.json({error:'تعذر حذف الكورس. تأكد أنه لا توجد بيانات مرتبطة تمنع الحذف.'},{status:400})
+  }
+}
