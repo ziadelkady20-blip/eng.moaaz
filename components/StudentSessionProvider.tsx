@@ -15,9 +15,10 @@ export default function StudentSessionProvider({children}:{children:ReactNode}){
   const pathname=usePathname()
 
   const load=async()=>{
+    let cachedUser:StudentUser|null=null
     try{
       const cached=sessionStorage.getItem('eng-moaaz-student-session')
-      if(cached){const parsed=JSON.parse(cached);if(parsed?.role==='STUDENT')setUser(parsed)}
+      if(cached){const parsed=JSON.parse(cached);if(parsed?.role==='STUDENT'){cachedUser=parsed;setUser(parsed)}}
     }catch{}
     try{
       const r=await fetch('/api/auth/me',{cache:'no-store'})
@@ -27,11 +28,19 @@ export default function StudentSessionProvider({children}:{children:ReactNode}){
       setUser(d.user)
       try{sessionStorage.setItem('eng-moaaz-student-session',JSON.stringify(d.user))}catch{}
     }catch{
-      setUser(null)
+      if(!cachedUser) setUser(null)
     }finally{setReady(true)}
   }
 
-  useEffect(()=>{load()},[])
+  useEffect(()=>{
+    if(pathname?.startsWith('/student') && !user) {
+      setReady(false)
+      load()
+    }
+  // Deliberately react only when entering a student route or when the user is cleared.
+  // This avoids a network auth request on every student navigation.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[pathname,user])
 
   useEffect(()=>{
     if(pathname?.startsWith('/student') && ready && !user) router.replace('/login')
