@@ -4,7 +4,7 @@ import {useEffect,useMemo,useState} from 'react'
 
 export default function AdminCourses(){
  const [data,setData]=useState<any>({courses:[]})
- const [meta,setMeta]=useState<any>({grades:[],subjects:[],teachers:[],lessons:[]})
+ const [meta,setMeta]=useState<any>({grades:[],lessons:[]})
  const [form,setForm]=useState<any>({title:'',description:'',price:0,gradeId:'',published:true})
  const [video,setVideo]=useState({lessonId:'',youtubeUrl:''})
  const [upload,setUpload]=useState({lessonId:'',title:'',description:'',privacy:'unlisted'})
@@ -15,8 +15,25 @@ export default function AdminCourses(){
  const [moduleForm,setModuleForm]=useState({courseId:'',title:''})
  const [lessonForm,setLessonForm]=useState({moduleId:'',title:''})
  const [busy,setBusy]=useState(false)
- const load=async()=>{setError('');try{const [a,b]=await Promise.all([fetch('/api/admin/courses',{cache:'no-store'}),fetch('/api/admin/meta',{cache:'no-store'})]);const ad=await a.json();const md=await b.json();if(!a.ok)throw Error(ad.error);if(!b.ok)throw Error(md.error);setData(ad);setMeta(md)}catch(e:any){setError(e.message||'تعذر تحميل المحتوى')}}
+
+ const load=async()=>{
+  setError('')
+  try{
+   const [a,b]=await Promise.all([
+    fetch('/api/admin/courses',{cache:'no-store'}),
+    fetch('/api/admin/meta',{cache:'no-store'})
+   ])
+   const ad=await a.json()
+   const md=await b.json()
+   if(!a.ok)throw Error(ad.error)
+   if(!b.ok)throw Error(md.error)
+   setData(ad)
+   setMeta({grades:md.grades||[],lessons:md.lessons||[]})
+  }catch(e:any){setError(e.message||'تعذر تحميل المحتوى')}
+ }
+
  useEffect(()=>{load()},[])
+
  const courses=data.courses||[]
  const gradeOptions=useMemo(()=>{
   const grades=meta.grades||[]
@@ -24,25 +41,194 @@ export default function AdminCourses(){
   const second=grades.find((g:any)=>g.name.includes('الثاني الثانوي')||g.name.includes('تانية ثانوي')||g.name.includes('ثانية ثانوي')||g.name.includes('2 ثانوي'))
   return [first,second].filter(Boolean)
  },[meta.grades])
+
  const selectedCourse=useMemo(()=>courses.find((c:any)=>c.id===moduleForm.courseId),[courses,moduleForm.courseId])
  const modules=selectedCourse?.modules||[]
  const selectedModule=useMemo(()=>modules.find((m:any)=>m.id===lessonForm.moduleId),[modules,lessonForm.moduleId])
- async function createCourse(e:any){e.preventDefault();setError('');setMessage('');const r=await fetch('/api/admin/courses',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});const d=await r.json();if(!r.ok)return setError(d.error);setForm({...form,title:'',description:'',price:0});setMessage('تم إنشاء الكورس');await load()}
- async function createModule(e:any){e.preventDefault();setBusy(true);setError('');setMessage('');try{const r=await fetch('/api/admin/modules',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(moduleForm)});const d=await r.json();if(!r.ok)throw Error(d.error);setMessage('تمت إضافة الوحدة بنجاح');setModuleForm({...moduleForm,title:''});await load()}catch(e:any){setError(e.message)}finally{setBusy(false)}}
- async function createLesson(e:any){e.preventDefault();setBusy(true);setError('');setMessage('');try{const r=await fetch('/api/admin/lessons',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(lessonForm)});const d=await r.json();if(!r.ok)throw Error(d.error);setMessage('تمت إضافة الدرس بنجاح');setLessonForm({...lessonForm,title:''});await load()}catch(e:any){setError(e.message)}finally{setBusy(false)}}
- async function addVideo(e:any){e.preventDefault();const r=await fetch('/api/admin/videos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(video)});const d=await r.json();if(!r.ok)return setError(d.error);setMessage('تم ربط فيديو YouTube بالدرس');setVideo({lessonId:'',youtubeUrl:''});load()}
- async function uploadVideo(e:any){e.preventDefault();if(!file)return setError('اختر ملف الفيديو');setUploading(true);const fd=new FormData();fd.append('lessonId',upload.lessonId);fd.append('title',upload.title);fd.append('description',upload.description);fd.append('privacy',upload.privacy);fd.append('file',file);const r=await fetch('/api/admin/youtube/upload',{method:'POST',body:fd});const d=await r.json();setUploading(false);if(!r.ok)return setError(d.error);setMessage('تم رفع الفيديو إلى YouTube وربطه بالدرس');setFile(null);setUpload({lessonId:'',title:'',description:'',privacy:'unlisted'});load()}
+
+ async function createCourse(e:any){
+  e.preventDefault();setError('');setMessage('')
+  const r=await fetch('/api/admin/courses',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)})
+  const d=await r.json()
+  if(!r.ok)return setError(d.error)
+  setForm({title:'',description:'',price:0,gradeId:'',published:true})
+  setMessage('تم إنشاء الكورس بنجاح')
+  await load()
+ }
+
+ async function createModule(e:any){
+  e.preventDefault();setBusy(true);setError('');setMessage('')
+  try{
+   const r=await fetch('/api/admin/modules',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(moduleForm)})
+   const d=await r.json()
+   if(!r.ok)throw Error(d.error)
+   setMessage('تمت إضافة الوحدة بنجاح')
+   setModuleForm({...moduleForm,title:''})
+   await load()
+  }catch(e:any){setError(e.message)}finally{setBusy(false)}
+ }
+
+ async function createLesson(e:any){
+  e.preventDefault();setBusy(true);setError('');setMessage('')
+  try{
+   const r=await fetch('/api/admin/lessons',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(lessonForm)})
+   const d=await r.json()
+   if(!r.ok)throw Error(d.error)
+   setMessage('تمت إضافة الدرس بنجاح')
+   setLessonForm({...lessonForm,title:''})
+   await load()
+  }catch(e:any){setError(e.message)}finally{setBusy(false)}
+ }
+
+ async function addVideo(e:any){
+  e.preventDefault()
+  const r=await fetch('/api/admin/videos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(video)})
+  const d=await r.json()
+  if(!r.ok)return setError(d.error)
+  setMessage('تم ربط فيديو YouTube بالدرس')
+  setVideo({lessonId:'',youtubeUrl:''})
+  load()
+ }
+
+ async function uploadVideo(e:any){
+  e.preventDefault()
+  if(!file)return setError('اختر ملف الفيديو')
+  setUploading(true)
+  const fd=new FormData()
+  fd.append('lessonId',upload.lessonId)
+  fd.append('title',upload.title)
+  fd.append('description',upload.description)
+  fd.append('privacy',upload.privacy)
+  fd.append('file',file)
+  const r=await fetch('/api/admin/youtube/upload',{method:'POST',body:fd})
+  const d=await r.json()
+  setUploading(false)
+  if(!r.ok)return setError(d.error)
+  setMessage('تم رفع الفيديو إلى YouTube وربطه بالدرس')
+  setFile(null)
+  setUpload({lessonId:'',title:'',description:'',privacy:'unlisted'})
+  load()
+ }
+
  return <AdminShell>
-  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-7"><div><h1 className="text-3xl font-black">إدارة الكورسات والمحتوى</h1><p className="muted mt-2">أنشئ الكورس، أضف الوحدات والدروس، ثم اربط كل درس بالفيديو المناسب.</p></div><button onClick={load} className="btn btn-soft">تحديث المحتوى</button></div>
-  {message&&<div className="card p-4 mb-5 bg-green-50 text-green-700">{message}</div>}{error&&<div className="card p-4 mb-5 bg-red-50 text-red-700">{error}</div>}
-  <div className="grid lg:grid-cols-2 gap-5">
-   <form onSubmit={createCourse} className="card p-6 space-y-4"><div><h2 className="text-xl font-black">إضافة كورس</h2><p className="muted text-sm mt-1">أدخل بيانات الكورس وحدد الصف فقط.</p></div><input className="w-full border rounded-xl p-3" placeholder="اسم الكورس" value={form.title} onChange={e=>setForm({...form,title:e.target.value})} required/><textarea className="w-full border rounded-xl p-3" placeholder="وصف مختصر" value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/><input type="number" min="0" className="w-full border rounded-xl p-3" placeholder="السعر بالجنيه" value={form.price} onChange={e=>setForm({...form,price:e.target.value})}/><select className="w-full border rounded-xl p-3" value={form.gradeId} onChange={e=>setForm({...form,gradeId:e.target.value})} required><option value="">اختر الصف</option>{gradeOptions.map((g:any)=><option key={g.id} value={g.id}>{g.name}</option>)}</select><button className="btn btn-primary w-full">إنشاء الكورس</button></form>
-   <div className="card p-6 space-y-4"><div><h2 className="text-xl font-black">بناء محتوى الكورس</h2><p className="muted text-sm mt-1">أضف الوحدات والدروس بالترتيب. بعد ذلك اربط الفيديو بالدرس.</p></div><form onSubmit={createModule} className="space-y-3"><select className="w-full border rounded-xl p-3" value={moduleForm.courseId} onChange={e=>{setModuleForm({...moduleForm,courseId:e.target.value});setLessonForm({moduleId:'',title:''})}} required><option value="">اختر الكورس</option>{courses.map((c:any)=><option key={c.id} value={c.id}>{c.title}</option>)}</select><div className="flex gap-2"><input className="flex-1 border rounded-xl p-3" placeholder="اسم الوحدة — مثال: Unit 1" value={moduleForm.title} onChange={e=>setModuleForm({...moduleForm,title:e.target.value})} required/><button disabled={busy} className="btn btn-primary">إضافة وحدة</button></div></form><form onSubmit={createLesson} className="space-y-3 border-t pt-4"><select className="w-full border rounded-xl p-3" value={lessonForm.moduleId} onChange={e=>setLessonForm({...lessonForm,moduleId:e.target.value})} required disabled={!moduleForm.courseId}><option value="">اختر الوحدة</option>{modules.map((m:any)=><option key={m.id} value={m.id}>{m.order}. {m.title}</option>)}</select><div className="flex gap-2"><input className="flex-1 border rounded-xl p-3" placeholder="اسم الدرس — مثال: شرح الدرس الأول" value={lessonForm.title} onChange={e=>setLessonForm({...lessonForm,title:e.target.value})} required/><button disabled={busy||!selectedModule} className="btn btn-primary">إضافة درس</button></div>{selectedModule&&<div className="text-sm muted">عدد الدروس داخل الوحدة: {selectedModule.lessons?.length||0}</div>}</form></div>
+  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-7">
+   <div>
+    <h1 className="text-3xl font-black">إدارة الكورسات والمحتوى</h1>
+    <p className="muted mt-2">أنشئ الكورس للصف، ثم أضف الوحدات والدروس واربط كل درس بالفيديو المناسب.</p>
+   </div>
+   <button onClick={load} className="btn btn-soft">تحديث المحتوى</button>
   </div>
-  <div className="card p-6 mt-5"><div className="flex items-center justify-between mb-4"><div><h2 className="text-xl font-black">محتوى الكورسات الحالية</h2><p className="muted text-sm mt-1">راجع الوحدات والدروس والفيديو المرتبط بكل درس.</p></div><span className="badge">{courses.length} كورسات</span></div>{courses.length?<div className="space-y-4">{courses.map((c:any)=><div key={c.id} className="border rounded-2xl p-4"><div className="flex flex-col md:flex-row md:items-center justify-between gap-2"><div><div className="font-black text-lg">{c.title}</div><div className="muted text-sm">{c.grade.name} • {c.subject.name} • {c.teacher.user.name}</div></div><div className="flex gap-2"><span className="badge">{c._count.enrollments} مشترك</span><span className="badge">{c.price} ج.م</span></div></div><div className="mt-4 space-y-2">{c.modules?.length?c.modules.map((m:any)=><div key={m.id} className="rounded-xl bg-[var(--primary-soft)] p-3"><div className="font-bold">الوحدة {m.order}: {m.title}</div>{m.lessons?.length?<div className="mt-2 space-y-1">{m.lessons.map((l:any)=><div key={l.id} className="flex items-center justify-between gap-2 bg-white rounded-lg px-3 py-2 text-sm"><span>{l.order}. {l.title}</span><span className="badge">{l.video?'🎬 فيديو مرتبط':'بدون فيديو'}</span></div>)}</div>:<div className="muted text-sm mt-2">لا توجد دروس داخل الوحدة حتى الآن.</div>}</div>):<div className="muted text-sm">لا توجد وحدات داخل الكورس حتى الآن.</div>}</div></div>)} </div>:<div className="p-8 text-center muted">لا توجد كورسات بعد.</div>}</div>
+
+  {message&&<div className="card p-4 mb-5 bg-green-50 text-green-700">{message}</div>}
+  {error&&<div className="card p-4 mb-5 bg-red-50 text-red-700">{error}</div>}
+
+  <div className="grid lg:grid-cols-2 gap-5">
+   <form onSubmit={createCourse} className="card p-6 space-y-4">
+    <div>
+     <h2 className="text-xl font-black">إضافة كورس</h2>
+     <p className="muted text-sm mt-1">الكورس تابع للمدرس والمادة الأساسية للمنصة تلقائيًا. حدد الصف فقط.</p>
+    </div>
+    <input className="w-full border rounded-xl p-3" placeholder="اسم الكورس" value={form.title} onChange={e=>setForm({...form,title:e.target.value})} required/>
+    <textarea className="w-full border rounded-xl p-3" placeholder="وصف مختصر" value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
+    <input type="number" min="0" className="w-full border rounded-xl p-3" placeholder="السعر بالجنيه" value={form.price} onChange={e=>setForm({...form,price:e.target.value})}/>
+    <select className="w-full border rounded-xl p-3" value={form.gradeId} onChange={e=>setForm({...form,gradeId:e.target.value})} required>
+     <option value="">اختر الصف</option>
+     {gradeOptions.map((g:any)=><option key={g.id} value={g.id}>{g.name}</option>)}
+    </select>
+    <button className="btn btn-primary w-full">إنشاء الكورس</button>
+   </form>
+
+   <div className="card p-6 space-y-4">
+    <div>
+     <h2 className="text-xl font-black">بناء محتوى الكورس</h2>
+     <p className="muted text-sm mt-1">أضف الوحدات والدروس بالترتيب، ثم اربط الفيديو بالدرس.</p>
+    </div>
+    <form onSubmit={createModule} className="space-y-3">
+     <select className="w-full border rounded-xl p-3" value={moduleForm.courseId} onChange={e=>{setModuleForm({...moduleForm,courseId:e.target.value});setLessonForm({moduleId:'',title:''})}} required>
+      <option value="">اختر الكورس</option>
+      {courses.map((c:any)=><option key={c.id} value={c.id}>{c.title}</option>)}
+     </select>
+     <div className="flex gap-2">
+      <input className="flex-1 border rounded-xl p-3" placeholder="اسم الوحدة — مثال: Unit 1" value={moduleForm.title} onChange={e=>setModuleForm({...moduleForm,title:e.target.value})} required/>
+      <button disabled={busy} className="btn btn-primary">إضافة وحدة</button>
+     </div>
+    </form>
+    <form onSubmit={createLesson} className="space-y-3 border-t pt-4">
+     <select className="w-full border rounded-xl p-3" value={lessonForm.moduleId} onChange={e=>setLessonForm({...lessonForm,moduleId:e.target.value})} required disabled={!moduleForm.courseId}>
+      <option value="">اختر الوحدة</option>
+      {modules.map((m:any)=><option key={m.id} value={m.id}>{m.order}. {m.title}</option>)}
+     </select>
+     <div className="flex gap-2">
+      <input className="flex-1 border rounded-xl p-3" placeholder="اسم الدرس — مثال: شرح الدرس الأول" value={lessonForm.title} onChange={e=>setLessonForm({...lessonForm,title:e.target.value})} required/>
+      <button disabled={busy||!selectedModule} className="btn btn-primary">إضافة درس</button>
+     </div>
+     {selectedModule&&<div className="text-sm muted">عدد الدروس داخل الوحدة: {selectedModule.lessons?.length||0}</div>}
+    </form>
+   </div>
+  </div>
+
+  <div className="card p-6 mt-5">
+   <div className="flex items-center justify-between mb-4">
+    <div>
+     <h2 className="text-xl font-black">محتوى الكورسات الحالية</h2>
+     <p className="muted text-sm mt-1">راجع الوحدات والدروس والفيديو المرتبط بكل درس.</p>
+    </div>
+    <span className="badge">{courses.length} كورسات</span>
+   </div>
+   {courses.length?<div className="space-y-4">
+    {courses.map((c:any)=><div key={c.id} className="border rounded-2xl p-4">
+     <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
+      <div>
+       <div className="font-black text-lg">{c.title}</div>
+       <div className="muted text-sm">{c.grade?.name||'بدون صف محدد'}</div>
+      </div>
+      <div className="flex gap-2">
+       <span className="badge">{c._count.enrollments} مشترك</span>
+       <span className="badge">{c.price} ج.م</span>
+      </div>
+     </div>
+     <div className="mt-4 space-y-2">
+      {c.modules?.length?c.modules.map((m:any)=><div key={m.id} className="rounded-xl bg-[var(--primary-soft)] p-3">
+       <div className="font-bold">الوحدة {m.order}: {m.title}</div>
+       {m.lessons?.length?<div className="mt-2 space-y-1">{m.lessons.map((l:any)=><div key={l.id} className="flex items-center justify-between gap-2 bg-white rounded-lg px-3 py-2 text-sm"><span>{l.order}. {l.title}</span><span className="badge">{l.video?'🎬 فيديو مرتبط':'بدون فيديو'}</span></div>)}</div>:<div className="muted text-sm mt-2">لا توجد دروس داخل الوحدة حتى الآن.</div>}
+      </div>):<div className="muted text-sm">لا توجد وحدات داخل الكورس حتى الآن.</div>}
+     </div>
+    </div>)}
+   </div>:<div className="p-8 text-center muted">لا توجد كورسات بعد.</div>}
+  </div>
+
   <div className="grid lg:grid-cols-2 gap-5 mt-5">
-   <form onSubmit={addVideo} className="card p-6 space-y-4"><h2 className="text-xl font-black">ربط فيديو YouTube</h2><p className="muted text-sm">الصق رابط فيديو موجود بالفعل واربطه بالدرس.</p><select className="w-full border rounded-xl p-3" value={video.lessonId} onChange={e=>setVideo({...video,lessonId:e.target.value})} required><option value="">اختر الدرس</option>{meta.lessons.map((l:any)=><option key={l.id} value={l.id}>{l.title} — {l.module.course.title}</option>)}</select><input className="w-full border rounded-xl p-3" placeholder="https://www.youtube.com/watch?v=..." value={video.youtubeUrl} onChange={e=>setVideo({...video,youtubeUrl:e.target.value})} required/><button className="btn btn-primary w-full">حفظ الفيديو</button></form>
-   <form onSubmit={uploadVideo} className="card p-6 space-y-4"><div className="flex items-center justify-between gap-3"><div><h2 className="text-xl font-black">رفع فيديو إلى YouTube</h2><p className="muted text-sm mt-1">بعد ربط القناة من الإعدادات، ارفع الملف واربطه بالدرس.</p></div><span className="badge">OAuth + YouTube API</span></div><select className="border rounded-xl p-3 w-full" value={upload.lessonId} onChange={e=>setUpload({...upload,lessonId:e.target.value})} required><option value="">اختر الدرس</option>{meta.lessons.map((l:any)=><option key={l.id} value={l.id}>{l.title} — {l.module.course.title}</option>)}</select><input className="border rounded-xl p-3 w-full" placeholder="عنوان الفيديو" value={upload.title} onChange={e=>setUpload({...upload,title:e.target.value})} required/><textarea className="border rounded-xl p-3 w-full" placeholder="وصف الفيديو" value={upload.description} onChange={e=>setUpload({...upload,description:e.target.value})}/><select className="border rounded-xl p-3 w-full" value={upload.privacy} onChange={e=>setUpload({...upload,privacy:e.target.value})}><option value="unlisted">غير مدرج</option><option value="private">خاص</option><option value="public">عام</option></select><input type="file" accept="video/*" className="border rounded-xl p-3 w-full" onChange={e=>setFile(e.target.files?.[0]||null)} required/><button disabled={uploading} className="btn btn-primary w-full">{uploading?'جاري الرفع...':'رفع الفيديو وربطه بالدرس'}</button></form>
+   <form onSubmit={addVideo} className="card p-6 space-y-4">
+    <h2 className="text-xl font-black">ربط فيديو YouTube</h2>
+    <p className="muted text-sm">الصق رابط فيديو موجود بالفعل واربطه بالدرس.</p>
+    <select className="w-full border rounded-xl p-3" value={video.lessonId} onChange={e=>setVideo({...video,lessonId:e.target.value})} required>
+     <option value="">اختر الدرس</option>
+     {meta.lessons.map((l:any)=><option key={l.id} value={l.id}>{l.title} — {l.module.course.title}</option>)}
+    </select>
+    <input className="w-full border rounded-xl p-3" placeholder="https://www.youtube.com/watch?v=..." value={video.youtubeUrl} onChange={e=>setVideo({...video,youtubeUrl:e.target.value})} required/>
+    <button className="btn btn-primary w-full">حفظ الفيديو</button>
+   </form>
+
+   <form onSubmit={uploadVideo} className="card p-6 space-y-4">
+    <div className="flex items-center justify-between gap-3">
+     <div>
+      <h2 className="text-xl font-black">رفع فيديو إلى YouTube</h2>
+      <p className="muted text-sm mt-1">بعد ربط القناة من الإعدادات، ارفع الملف واربطه بالدرس.</p>
+     </div>
+     <span className="badge">OAuth + YouTube API</span>
+    </div>
+    <select className="border rounded-xl p-3 w-full" value={upload.lessonId} onChange={e=>setUpload({...upload,lessonId:e.target.value})} required>
+     <option value="">اختر الدرس</option>
+     {meta.lessons.map((l:any)=><option key={l.id} value={l.id}>{l.title} — {l.module.course.title}</option>)}
+    </select>
+    <input className="border rounded-xl p-3 w-full" placeholder="عنوان الفيديو" value={upload.title} onChange={e=>setUpload({...upload,title:e.target.value})} required/>
+    <textarea className="border rounded-xl p-3 w-full" placeholder="وصف الفيديو" value={upload.description} onChange={e=>setUpload({...upload,description:e.target.value})}/>
+    <select className="border rounded-xl p-3 w-full" value={upload.privacy} onChange={e=>setUpload({...upload,privacy:e.target.value})}>
+     <option value="unlisted">غير مدرج</option><option value="private">خاص</option><option value="public">عام</option>
+    </select>
+    <input type="file" accept="video/*" className="border rounded-xl p-3 w-full" onChange={e=>setFile(e.target.files?.[0]||null)} required/>
+    <button disabled={uploading} className="btn btn-primary w-full">{uploading?'جاري الرفع...':'رفع الفيديو وربطه بالدرس'}</button>
+   </form>
   </div>
  </AdminShell>
 }
