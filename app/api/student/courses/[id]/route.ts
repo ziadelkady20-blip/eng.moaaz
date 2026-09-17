@@ -9,8 +9,11 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
     if (!u.student) return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
 
     const { id } = await params
+    if (!u.student.gradeId) {
+      return NextResponse.json({ error: 'حساب الطالب غير مرتبط بصف دراسي' }, { status: 400 })
+    }
     const course = await db.course.findFirst({
-      where: { id, published: true, gradeId: u.student.gradeId ?? undefined },
+      where: { id, published: true, gradeId: u.student.gradeId },
       include: {
         grade: true,
         subject: true,
