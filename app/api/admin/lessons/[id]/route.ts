@@ -15,3 +15,5 @@ export async function DELETE(_:Request,{params}:{params:Promise<{id:string}>}){
     return NextResponse.json({ok:true})
   }catch(e){console.error('ADMIN_LESSON_DELETE_ERROR',e);return NextResponse.json({error:'تعذر حذف الدرس'},{status:400})}
 }
+
+export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){try{await requireRole(['ADMIN']);const {id}=await params;const body=await req.json();const title=typeof body?.title==='string'?body.title.trim():'';if(!title)return NextResponse.json({error:'اسم الدرس مطلوب'},{status:400});const lesson=await db.lesson.update({where:{id},data:{title}});return NextResponse.json({lesson})}catch(e){return NextResponse.json({error:'تعذر تعديل الدرس'},{status:400})}}
