@@ -156,6 +156,7 @@ model Course {
   id            String             @id @default(cuid())
   title         String
   description   String?
+  coverUrl      String?
   price         Float              @default(0)
   published     Boolean            @default(false)
   gradeId       String
