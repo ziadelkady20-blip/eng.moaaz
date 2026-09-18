@@ -18,3 +18,5 @@ export async function DELETE(_:Request,{params}:{params:Promise<{id:string}>}){
     return NextResponse.json({ok:true})
   }catch(e){console.error('ADMIN_MODULE_DELETE_ERROR',e);return NextResponse.json({error:'تعذر حذف الوحدة'},{status:400})}
 }
+
+export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){try{await requireRole(['ADMIN']);const {id}=await params;const body=await req.json();const title=typeof body?.title==='string'?body.title.trim():'';if(!title)return NextResponse.json({error:'اسم الوحدة مطلوب'},{status:400});const module=await db.courseModule.update({where:{id},data:{title}});return NextResponse.json({module})}catch(e){return NextResponse.json({error:'تعذر تعديل الوحدة'},{status:400})}}
