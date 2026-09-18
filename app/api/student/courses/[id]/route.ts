@@ -16,9 +16,9 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
     if (!course) return NextResponse.json({ error: 'الكورس غير متاح لصفك' }, { status: 404 })
     const [enrollment, purchase, progress, walletRows] = await Promise.all([
       db.courseEnrollment.findUnique({ where: { studentId_courseId: { studentId: u.student.id, courseId: id } } }),
-      db.$queryRaw<any[]>(Prisma.sql\`SELECT "id" FROM "ContentPurchase" WHERE "studentId"=\${u.student.id} AND "courseId"=\${id} LIMIT 1\`),
+      db.$queryRaw<any[]>(Prisma.sql`SELECT "id" FROM "ContentPurchase" WHERE "studentId"=${u.student.id} AND "courseId"=${id} LIMIT 1`),
       db.studentProgress.findMany({ where: { studentId: u.student.id, lesson: { module: { courseId: id } } } }),
-      db.$queryRaw<any[]>(Prisma.sql\`SELECT "balance" FROM "Wallet" WHERE "studentId"=\${u.student.id} LIMIT 1\`),
+      db.$queryRaw<any[]>(Prisma.sql`SELECT "balance" FROM "Wallet" WHERE "studentId"=${u.student.id} LIMIT 1`),
     ])
     const enrolled = !!enrollment || purchase.length > 0
     const map = new Map(progress.map(p => [p.lessonId, p]))
