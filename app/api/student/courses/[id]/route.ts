@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { requireRole } from '@/lib/auth'
 
+// Student course access endpoint
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const u = await requireRole(['STUDENT'])
