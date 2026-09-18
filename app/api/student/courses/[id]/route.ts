@@ -35,7 +35,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
       return NextResponse.json({ error: 'الكورس غير متاح لصفك' }, { status: 404 })
     }
 
-    const [enrollment, purchase, progress, walletRows, coverRows] = await Promise.all([
+    const [enrollment, purchase, progress, walletRows] = await Promise.all([
       db.courseEnrollment.findUnique({
         where: {
           studentId_courseId: {
@@ -80,7 +80,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
           id: course.id,
           title: course.title,
           description: course.description,
-          coverUrl: coverRows[0]?.coverUrl ?? null,
+          coverUrl: course.coverUrl,
           price: Number(course.price),
           grade: course.grade.name,
           subject: course.subject.name,
