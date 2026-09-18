@@ -25,7 +25,7 @@ export async function GET(){
       include:{grade:true,subject:true,teacher:{include:{user:true}},modules:{include:{lessons:true},orderBy:{order:'asc'}}},
       orderBy:{createdAt:'desc'}
     })
-    const coverRows=await db.$queryRaw<any[]>(Prisma.sql`SELECT "id","coverUrl" FROM "Course" WHERE "id" IN (${Prisma.join(courses.map(c=>c.id))})`)
+    const coverRows=await db.$queryRaw<any[]>(Prisma.sql`SELECT "id","coverUrl" FROM "Course"`)
     const coverById=new Map(coverRows.map(x=>[x.id,x.coverUrl]))
     const [enrolled,progress,purchases]=await Promise.all([
       db.courseEnrollment.findMany({where:{studentId:student.id},select:{courseId:true}}),
