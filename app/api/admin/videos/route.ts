@@ -51,3 +51,24 @@ export async function POST(req:Request){
     return NextResponse.json({error:'تعذر ربط فيديو YouTube بالدرس'},{status:400})
   }
 }
+
+
+export async function DELETE(req:Request){
+  try{
+    await requireRole(['ADMIN'])
+    const body=await req.json()
+    const lessonId=typeof body?.lessonId==='string'?body.lessonId:''
+    if(!lessonId) return NextResponse.json({error:'الدرس غير محدد'},{status:400})
+    const lesson=await db.lesson.findUnique({where:{id:lessonId},select:{id:true,videoId:true}})
+    if(!lesson) return NextResponse.json({error:'الدرس غير موجود'},{status:404})
+    if(!lesson.videoId) return NextResponse.json({error:'لا يوجد فيديو مرتبط بهذا الدرس'},{status:404})
+    await db.$transaction(async tx=>{
+      await tx.lesson.update({where:{id:lessonId},data:{videoId:null}})
+      await tx.video.delete({where:{id:lesson.videoId!}})
+    })
+    return NextResponse.json({ok:true})
+  }catch(e){
+    console.error('ADMIN_VIDEO_DELETE_ERROR',e)
+    return NextResponse.json({error:'تعذر حذف الفيديو المرتبط'},{status:400})
+  }
+}
