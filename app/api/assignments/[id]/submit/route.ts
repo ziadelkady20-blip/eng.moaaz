@@ -1,4 +1,5 @@
 import {NextResponse} from 'next/server'
+import {Prisma} from '@prisma/client'
 import {requireRole} from '@/lib/auth'
 import {db} from '@/lib/db'
 
@@ -18,7 +19,8 @@ export async function POST(req:Request,{params}:{params:Promise<{id:string}>}){
     const enrolled=await db.courseEnrollment.findUnique({
       where:{studentId_courseId:{studentId:user.student.id,courseId:assignment.courseId}},
     })
-    if(!enrolled)return NextResponse.json({error:'الواجب غير متاح لحسابك'},{status:403})
+    const purchase=await db.$queryRaw<any[]>(Prisma.sql`SELECT "id" FROM "ContentPurchase" WHERE "studentId"=${user.student.id} AND "courseId"=${assignment.courseId} LIMIT 1`)
+    if(!enrolled&&!purchase.length)return NextResponse.json({error:'الواجب غير متاح لحسابك'},{status:403})
 
     const modules=await db.courseModule.findMany({
       where:{courseId:assignment.courseId},
