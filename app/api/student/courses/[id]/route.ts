@@ -24,7 +24,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
           include: {
             lessons: {
               orderBy: { order: 'asc' },
-              include: { video: true },
+              include: { video: true, assignments: { orderBy: { dueAt: 'asc' } } },
             },
           },
         },
@@ -35,7 +35,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
       return NextResponse.json({ error: 'الكورس غير متاح لصفك' }, { status: 404 })
     }
 
-    const [enrollment, purchase, progress, walletRows] = await Promise.all([
+    const [enrollment, purchase, progress, submissions, walletRows] = await Promise.all([
       db.courseEnrollment.findUnique({
         where: {
           studentId_courseId: {
@@ -55,6 +55,14 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
           lesson: { module: { courseId: id } },
         },
       }),
+      db.assignmentSubmission.findMany({
+        where: {
+          studentId: u.student.id,
+          assignment: { courseId: id },
+          submittedAt: { not: null },
+        },
+        select: { assignmentId: true, submittedAt: true },
+      }),
       db.$queryRawUnsafe<any[]>(
         'SELECT "balance" FROM "Wallet" WHERE "studentId"=$1 LIMIT 1',
         u.student.id,
@@ -67,12 +75,29 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 
     const enrolled = !!enrollment || purchase.length > 0
     const progressMap = new Map(progress.map((p) => [p.lessonId, p]))
+    const submittedSet = new Set(submissions.map((s) => s.assignmentId))
     const balance = Number(walletRows[0]?.balance ?? 0)
     const totalLessons = course.modules.reduce((n, m) => n + m.lessons.length, 0)
     const completedLessons = course.modules.reduce(
       (n, m) => n + m.lessons.filter((l) => progressMap.get(l.id)?.completed).length,
       0,
     )
+    const orderedLessons = course.modules.flatMap((m) => m.lessons)
+    const lessonLock = new Map<string, boolean>()
+    orderedLessons.forEach((lesson, index) => {
+      if (!enrolled) {
+        lessonLock.set(lesson.id, true)
+        return
+      }
+      if (index === 0) {
+        lessonLock.set(lesson.id, false)
+        return
+      }
+      const previous = orderedLessons[index - 1]
+      const previousAssignments = previous.assignments
+      const previousSolved = previousAssignments.length === 0 || previousAssignments.every((a) => submittedSet.has(a.id))
+      lessonLock.set(lesson.id, !previousSolved)
+    })
 
     return NextResponse.json(
       {
@@ -99,9 +124,17 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
               title: l.title,
               order: l.order,
               hasVideo: !!l.video,
-              locked: !enrolled,
+              locked: lessonLock.get(l.id) ?? true,
+              lockedReason: lessonLock.get(l.id) ? 'أكمل واجب الدرس السابق أولًا' : null,
               progress: progressMap.get(l.id)?.watchedPct ?? 0,
               completed: progressMap.get(l.id)?.completed ?? false,
+              assignments: l.assignments.map((a) => ({
+                id: a.id,
+                title: a.title,
+                description: a.description,
+                dueAt: a.dueAt,
+                submitted: submittedSet.has(a.id),
+              })),
             })),
           })),
         },
