@@ -207,8 +207,9 @@ model Lesson {
   videoId   String?           @unique
   module    CourseModule      @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   video     Video?            @relation(fields: [videoId], references: [id])
-  resources LessonResource[]
-  progress  StudentProgress[]
+  resources    LessonResource[]
+  progress     StudentProgress[]
+  assignments  Assignment[]
 
   @@index([moduleId, order])
 }
@@ -305,8 +306,13 @@ model Assignment {
   description String?
   dueAt       DateTime
   courseId    String?
+  lessonId    String?
   submissions AssignmentSubmission[]
   course      Course?                @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  lesson      Lesson?                @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+
+  @@index([lessonId])
+  @@index([courseId, lessonId])
 }
 
 model AssignmentSubmission {
