@@ -1,4 +1,5 @@
 import {NextResponse} from 'next/server'
+import {Prisma} from '@prisma/client'
 import {db} from '@/lib/db'
 import {requireRole} from '@/lib/auth'
 
@@ -6,8 +7,14 @@ export async function GET(){
   try{
     const u=await requireRole(['STUDENT'])
     if(!u.student)return NextResponse.json({error:'غير مصرح'},{status:401})
+    const [enrollments,purchases]=await Promise.all([
+      db.courseEnrollment.findMany({where:{studentId:u.student.id},select:{courseId:true}}),
+      db.$queryRaw<any[]>(Prisma.sql`SELECT "courseId" FROM "ContentPurchase" WHERE "studentId"=${u.student.id}`),
+    ])
+    const courseIds=[...new Set([...enrollments.map((x)=>x.courseId),...purchases.map((x)=>x.courseId)])]
+    if(!courseIds.length)return NextResponse.json({assignments:[]})
     const assignments=await db.assignment.findMany({
-      where:{course:{enrollments:{some:{studentId:u.student.id}}}},
+      where:{courseId:{in:courseIds}},
       orderBy:{dueAt:'asc'},
       include:{
         course:true,
