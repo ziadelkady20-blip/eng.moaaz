@@ -31,11 +31,12 @@ export async function GET(_:Request,{params}:{params:Promise<{id:string}>}){
     return NextResponse.json({error:'هذا المحتوى غير متاح لحسابك. يجب شراء الكورس من المحفظة أولًا.'},{status:403})
   }
 
-  const orderedLessons=await db.lesson.findMany({
-    where:{module:{courseId:lesson.module.courseId}},
-    orderBy:[{module:{order:'asc'}},{order:'asc'}],
-    include:{assignments:{select:{id:true}}},
+  const orderedModules=await db.courseModule.findMany({
+    where:{courseId:lesson.module.courseId},
+    orderBy:{order:'asc'},
+    include:{lessons:{orderBy:{order:'asc'},include:{assignments:{select:{id:true}}}}},
   })
+  const orderedLessons=orderedModules.flatMap((m)=>m.lessons)
   const index=orderedLessons.findIndex((l)=>l.id===lesson.id)
   if(index>0){
     const previous=orderedLessons[index-1]
