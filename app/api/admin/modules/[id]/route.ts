@@ -13,6 +13,7 @@ export async function DELETE(_:Request,{params}:{params:Promise<{id:string}>}){
     await db.$transaction(async tx=>{
       if(lessonIds.length) await tx.lesson.updateMany({where:{id:{in:lessonIds}},data:{videoId:null}})
       if(videoIds.length) await tx.video.deleteMany({where:{id:{in:videoIds}}})
+      if(lessonIds.length) await tx.assignment.deleteMany({where:{lessonId:{in:lessonIds}}})
       await tx.courseModule.delete({where:{id}})
     })
     return NextResponse.json({ok:true})
