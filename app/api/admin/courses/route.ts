@@ -20,7 +20,7 @@ export async function GET(){
         grade:true,
         subject:true,
         teacher:{include:{user:true}},
-        modules:{include:{lessons:{include:{video:true,assignments:{orderBy:{dueAt:'asc'}}}},orderBy:{order:'asc'}},
+        modules:{include:{lessons:{include:{video:true,assignments:{orderBy:{dueAt:'asc'}}}}},orderBy:{order:'asc'}},
         _count:{select:{enrollments:true,orders:true}}
       },
       orderBy:{createdAt:'desc'}
