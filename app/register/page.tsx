@@ -5,8 +5,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 const grades = [
-  ['الأولى بكالوريا', 'الأولى بكالوريا'],
-  ['الثانية بكالوريا', 'الثانية بكالوريا'],
+  ['الصف الأول البكالوري', 'الصف الأول البكالوري'],
+  ['الصف الثاني البكالوري', 'الصف الثاني البكالوري'],
 ] as const
 
 const styles = `
