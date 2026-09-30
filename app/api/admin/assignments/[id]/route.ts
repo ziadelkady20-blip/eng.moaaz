@@ -1,49 +1,58 @@
-import {NextResponse} from 'next/server'
-import {db} from '@/lib/db'
-import {requireRole} from '@/lib/auth'
-import {z} from 'zod'
+import { NextResponse } from 'next/server'
+import { db } from '@/lib/db'
+import { requireRole } from '@/lib/auth'
+import { z } from 'zod'
 
-const schema=z.object({
-  lessonId:z.string().min(1).optional(),
-  title:z.string().trim().min(2).max(200).optional(),
-  description:z.string().trim().max(5000).optional(),
-  dueAt:z.coerce.date().optional(),
+const schema = z.object({
+  lessonId: z.string().min(1).optional(),
+  title: z.string().trim().min(2).max(200).optional(),
+  description: z.string().trim().max(5000).optional(),
+  dueAt: z.coerce.date().optional(),
+  fileUrl: z.string().url().optional().or(z.literal('')),
 })
 
-export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){
-  try{
-    await requireRole(['ADMIN'])
-    const {id}=await params
-    const body=await req.json()
-    const data=schema.parse(body)
-    const existing=await db.assignment.findUnique({where:{id}})
-    if(!existing)return NextResponse.json({error:'الواجب غير موجود'},{status:404})
-    const updateData:any={}
-    if(data.title!==undefined)updateData.title=data.title
-    if(data.description!==undefined)updateData.description=data.description||null
-    if(data.dueAt!==undefined)updateData.dueAt=data.dueAt
-    if(data.lessonId!==undefined){
-      const lesson=await db.lesson.findUnique({where:{id:data.lessonId},include:{module:{select:{courseId:true}}}})
-      if(!lesson)return NextResponse.json({error:'الدرس غير موجود'},{status:404})
-      updateData.lessonId=lesson.id
-      updateData.courseId=lesson.module.courseId
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const actor = await requireRole(['ADMIN'])
+    const { id } = await params
+    const data = schema.parse(await req.json())
+    const existing = await db.assignment.findUnique({ where: { id } })
+    if (!existing) return NextResponse.json({ error: 'الواجب غير موجود' }, { status: 404 })
+
+    const updateData: any = {}
+    if (data.title !== undefined) updateData.title = data.title
+    if (data.description !== undefined) updateData.description = data.description || null
+    if (data.dueAt !== undefined) updateData.dueAt = data.dueAt
+    if (data.fileUrl !== undefined) {
+      if (data.fileUrl) {
+        const file = await db.uploadedFile.findFirst({ where: { url: data.fileUrl, ownerId: actor.id, mimeType: 'application/pdf' } })
+        if (!file) return NextResponse.json({ error: 'ملف الواجب غير صالح' }, { status: 400 })
+      }
+      updateData.fileUrl = data.fileUrl || null
     }
-    const assignment=await db.assignment.update({where:{id},data:updateData})
-    return NextResponse.json({assignment})
-  }catch(e){
-    return NextResponse.json({error:e instanceof z.ZodError?'بيانات التعديل غير صحيحة':'تعذر تعديل الواجب'},{status:400})
+    if (data.lessonId !== undefined) {
+      const lesson = await db.lesson.findUnique({ where: { id: data.lessonId }, include: { module: { select: { courseId: true } } } })
+      if (!lesson) return NextResponse.json({ error: 'الدرس غير موجود' }, { status: 404 })
+      updateData.lessonId = lesson.id
+      updateData.courseId = lesson.module.courseId
+    }
+
+    const assignment = await db.assignment.update({ where: { id }, data: updateData })
+    return NextResponse.json({ assignment })
+  } catch (e) {
+    return NextResponse.json({ error: e instanceof z.ZodError ? 'بيانات التعديل غير صحيحة' : 'تعذر تعديل الواجب' }, { status: 400 })
   }
 }
 
-export async function DELETE(_:Request,{params}:{params:Promise<{id:string}>}){
-  try{
+export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
     await requireRole(['ADMIN'])
-    const {id}=await params
-    const existing=await db.assignment.findUnique({where:{id},select:{id:true}})
-    if(!existing)return NextResponse.json({error:'الواجب غير موجود'},{status:404})
-    await db.assignment.delete({where:{id}})
-    return NextResponse.json({ok:true})
-  }catch(e){
-    return NextResponse.json({error:'تعذر حذف الواجب'},{status:400})
+    const { id } = await params
+    const existing = await db.assignment.findUnique({ where: { id }, select: { id: true } })
+    if (!existing) return NextResponse.json({ error: 'الواجب غير موجود' }, { status: 404 })
+    await db.assignment.delete({ where: { id } })
+    return NextResponse.json({ ok: true })
+  } catch {
+    return NextResponse.json({ error: 'تعذر حذف الواجب' }, { status: 400 })
   }
 }
