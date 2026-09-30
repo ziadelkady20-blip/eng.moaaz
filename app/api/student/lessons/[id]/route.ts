@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { Prisma } from '@prisma/client'
 import { db } from '@/lib/db'
 import { getCurrentUser } from '@/lib/auth'
 
@@ -21,32 +20,23 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 
     if (!lesson) return NextResponse.json({ error: 'الدرس غير موجود' }, { status: 404 })
 
-    // Student lesson access is based on the student's grade + purchased/enrolled course.
-    // Do not query the old StudentLessonAccess table here because it is not part of the
-    // current Prisma schema and caused the lesson API to crash with an empty response.
+    // A student can open a lesson only when it belongs to the student's grade
+    // and the student is enrolled in that course. The old ContentPurchase /
+    // StudentLessonAccess tables are not part of the current Prisma schema.
     if (!user.student.gradeId || lesson.module.course.gradeId !== user.student.gradeId) {
       return NextResponse.json({ error: 'هذا الدرس غير متاح لصفك' }, { status: 403 })
     }
 
-    const [access, purchase] = await Promise.all([
-      db.courseEnrollment.findUnique({
-        where: {
-          studentId_courseId: {
-            studentId: user.student.id,
-            courseId: lesson.module.courseId,
-          },
+    const enrollment = await db.courseEnrollment.findUnique({
+      where: {
+        studentId_courseId: {
+          studentId: user.student.id,
+          courseId: lesson.module.courseId,
         },
-      }),
-      db.$queryRaw<any[]>(Prisma.sql`
-        SELECT "id"
-        FROM "ContentPurchase"
-        WHERE "studentId"=${user.student.id}
-          AND "courseId"=${lesson.module.courseId}
-        LIMIT 1
-      `),
-    ])
+      },
+    })
 
-    if (!access && !purchase.length) {
+    if (!enrollment) {
       return NextResponse.json(
         { error: 'هذا المحتوى غير متاح لحسابك. يجب شراء الكورس من المحفظة أولًا.' },
         { status: 403 },
@@ -108,7 +98,9 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
     ])
 
     const submissionMap = new Map(submissions.map((s) => [s.assignmentId, s]))
-    const providerAssetId = lesson.video?.isPublished ? lesson.video.providerAssetId : null
+    const videoId = lesson.video?.isPublished
+      ? lesson.video.providerAssetId || lesson.video.youtubeUrl
+      : null
 
     return NextResponse.json(
       {
@@ -116,8 +108,8 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
           id: lesson.id,
           title: lesson.title,
           course: lesson.module.course.title,
-          video: providerAssetId
-            ? { provider: lesson.video?.provider || 'YOUTUBE', id: providerAssetId }
+          video: videoId
+            ? { provider: lesson.video?.provider || 'YOUTUBE', id: videoId }
             : null,
           resources: lesson.resources,
           assignments: lesson.assignments.map((a) => ({
