@@ -1,4 +1,4 @@
-import { NextResponse } from '@/lib/server'
+import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { hashPassword } from '@/lib/auth'
 import { isSuperAdmin, requireAdminAccess } from '@/lib/admin-access'
