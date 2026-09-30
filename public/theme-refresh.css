@@ -1,0 +1,93 @@
+:root{
+  --primary:#f47b16;
+  --primary-dark:#dc6508;
+  --primary-soft:#fff0d8;
+  --purple:#f47b16;
+  --ink:#17253d;
+  --muted:#777b83;
+  --bg:#f8f7f2;
+  --white:#fffdf9;
+  --line:#e7e2d9;
+  --navy:#17253d;
+  --orange:#f47b16;
+  --orange-dark:#dc6508;
+}
+
+body{background:#f8f7f2;color:#17253d}
+.landing-page{background:linear-gradient(180deg,#fffdf9 0%,#f8f7f2 52%,#fffdf9 100%)}
+
+/* Remove the old purple identity everywhere on the marketing site. */
+.site-header{box-shadow:0 5px 18px rgba(23,37,61,.08)}
+.main-nav a:after{background:#f47b16}
+.main-nav a.active{color:#f47b16}
+.main-nav a.active:before{background:#f47b16}
+.theme-toggle span{border-color:#f47b16}
+.header-register{background:#f47b16;box-shadow:0 8px 18px rgba(244,123,22,.18)}
+
+.hero-section{background:radial-gradient(circle at 18% 45%,#fff0d8 0,#fffdf9 38%,#fffdf9 100%)}
+.hero-section:before{background:#fff0d8}
+.hero-section:after{background:radial-gradient(circle,rgba(244,123,22,.12),transparent 70%)}
+.hero-badge{background:#fff0d8;color:#a94e05;border-color:#f3c48f}
+.hero-copy h1 span{background:linear-gradient(90deg,#17253d,#f47b16);-webkit-background-clip:text;background-clip:text}
+.hero-primary{background:#f47b16;box-shadow:0 10px 24px rgba(244,123,22,.22)}
+.trust-item strong{color:#17253d}
+.avatars i{background:linear-gradient(145deg,#f47b16,#ffe5c8)}
+.hero-art{animation:heroFloatPremium 4.8s ease-in-out infinite;filter:drop-shadow(0 32px 48px rgba(23,37,61,.17))}
+.hero-orbit{border-color:rgba(244,123,22,.22);animation:orbitPremium 6s ease-in-out infinite}
+.hero-float{color:#f47b16;box-shadow:0 16px 32px rgba(23,37,61,.13)}
+.hero-float.spark{background:#fff0d8}.hero-float.dot{background:#ffe7cc}.hero-float.dot:before{background:#f47b16}
+
+.stages-section{background:linear-gradient(180deg,#fffdf9 0%,#f8f7f2 100%)}
+.stages-heading>span{background:#fff0d8;color:#b05208}
+.grade-card:hover{box-shadow:0 20px 40px rgba(23,37,61,.13)}
+.grade-cover:after{background:linear-gradient(135deg,rgba(244,123,22,.88),rgba(23,37,61,.18))}
+.grade-card.tone-violet .grade-cover:after{background:linear-gradient(135deg,rgba(244,123,22,.88),rgba(23,37,61,.18))}
+.grade-icon{background:#fff0d8;color:#f47b16}
+.grade-card>b{background:#f47b16}
+
+.platform-story-visual:before{background:#fff0d8}
+.platform-story-card-icon{background:#fff0d8;color:#f47b16}
+.platform-story-badge{border-color:#f3c48f;background:#fff7ed;color:#b05208}
+.platform-story-copy h2 span{color:#f47b16}
+.story-point i{background:#fff0d8;color:#f47b16}
+.story-primary{background:#f47b16;box-shadow:0 10px 22px rgba(244,123,22,.2)}
+.story-secondary span{color:#f47b16}
+.stats-strip strong{color:#17253d}
+.stats-strip em{background:#fff0d8;color:#f47b16}
+
+.why-heading h2 span{color:#f47b16}
+.feature-card{animation:featureFloat 5.5s ease-in-out infinite;will-change:transform}
+.feature-card:nth-child(2){animation-delay:-1.2s}.feature-card:nth-child(3){animation-delay:-2.4s}.feature-card:nth-child(4){animation-delay:-3.6s}.feature-card:nth-child(5){animation-delay:-4.8s}.feature-card:nth-child(6){animation-delay:-1.8s}
+.feature-card:hover{box-shadow:0 18px 36px rgba(23,37,61,.11)}
+.feature-icon{background:#fff0d8;color:#f47b16}
+.feature-card h3{color:#17253d}
+
+.bottom-cta{background:linear-gradient(105deg,#17253d,#243653 62%,#f47b16);box-shadow:0 15px 32px rgba(23,37,61,.16)}
+.bottom-cta:after{background:radial-gradient(circle,#ffd3a7,transparent 65%)}
+.cta-button{color:#17253d}
+
+/* Student dashboard: neutralize legacy purple utility classes. */
+.student-shell{background:#f8f7f2!important;color:#17253d}
+[class*="6d2fa3"]{background-color:#f47b16!important;color:#fff!important}
+[class*="432067"]{background-color:#17253d!important}
+[class*="8d54bd"]{background-color:#f47b16!important}
+[class*="5c2889"]{color:#17253d!important}
+[class*="5b287f"]{color:#17253d!important}
+[class*="f4ecfa"]{background:#fff0d8!important}
+[class*="faf6fd"]{background:#fffaf4!important}
+[class*="faf7fd"]{background:#fffaf4!important}
+[class*="e9e1ee"]{background:#e8e3da!important}
+[class*="eee8f4"]{border-color:#e7e2d9!important}
+[class*="f0ebf4"]{border-color:#eee9df!important}
+[class*="e5dced"]{border-color:#f0c48f!important}
+
+/* More lively feature/course interactions. */
+.grade-card,.feature-card,.course-card,.book-card,.lesson-card,.exam-card,.assignment-card{transform-style:preserve-3d;will-change:transform}
+.grade-card img,.course-card img{transition:transform .65s cubic-bezier(.2,.8,.2,1)}
+.grade-card:hover img,.course-card:hover img{transform:scale(1.07)}
+
+@keyframes featureFloat{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-8px,0)}}
+@keyframes heroFloatPremium{0%,100%{transform:scale(1.08) translate3d(-18px,0,0) rotate(0deg)}25%{transform:scale(1.09) translate3d(-15px,-7px,0) rotate(-.35deg)}50%{transform:scale(1.105) translate3d(-18px,-14px,0) rotate(.35deg)}75%{transform:scale(1.09) translate3d(-21px,-7px,0) rotate(-.2deg)}}
+@keyframes orbitPremium{0%,100%{opacity:.35;transform:translate(-50%,-50%) rotate(-7deg) scale(1)}50%{opacity:.8;transform:translate(-50%,-50%) rotate(2deg) scale(1.05)}}
+
+@media(prefers-reduced-motion:reduce){.feature-card,.hero-art,.hero-orbit{animation:none!important}.grade-card,.feature-card{transition:none!important}}
