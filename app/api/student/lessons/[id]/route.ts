@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { getCurrentUser } from '@/lib/auth'
 
+export const runtime = 'nodejs'
+
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await getCurrentUser()
@@ -9,21 +11,26 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 
     const { id } = await params
 
-    // Keep the core lesson query small and independent from the optional
-    // assignment/submission data. This prevents a problem in the assignment
-    // tables from taking the whole lesson/video page down with a 500.
     const lesson = await db.lesson.findUnique({
       where: { id },
-      include: {
-        module: { include: { course: true } },
-        video: true,
-        resources: true,
-      },
+      select: { id: true, title: true, moduleId: true, videoId: true },
     })
 
     if (!lesson) return NextResponse.json({ error: 'الدرس غير موجود' }, { status: 404 })
 
-    if (!user.student.gradeId || lesson.module.course.gradeId !== user.student.gradeId) {
+    const module = await db.courseModule.findUnique({
+      where: { id: lesson.moduleId },
+      select: { id: true, courseId: true },
+    })
+    if (!module) return NextResponse.json({ error: 'بيانات الدرس غير مكتملة' }, { status: 500 })
+
+    const course = await db.course.findUnique({
+      where: { id: module.courseId },
+      select: { id: true, title: true, gradeId: true },
+    })
+    if (!course) return NextResponse.json({ error: 'الكورس المرتبط بالدرس غير موجود' }, { status: 500 })
+
+    if (!user.student.gradeId || course.gradeId !== user.student.gradeId) {
       return NextResponse.json({ error: 'هذا الدرس غير متاح لصفك' }, { status: 403 })
     }
 
@@ -31,7 +38,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
       where: {
         studentId_courseId: {
           studentId: user.student.id,
-          courseId: lesson.module.courseId,
+          courseId: course.id,
         },
       },
     })
@@ -43,12 +50,31 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
       )
     }
 
-    const progress = await db.studentProgress.findUnique({
-      where: { studentId_lessonId: { studentId: user.student.id, lessonId: id } },
-    })
+    let progress: any = null
+    try {
+      progress = await db.studentProgress.findUnique({
+        where: { studentId_lessonId: { studentId: user.student.id, lessonId: id } },
+      })
+    } catch (error) {
+      console.error('STUDENT_LESSON_PROGRESS_READ_ERROR', error)
+    }
 
-    // Assignments are optional for opening a lesson. Read them separately so
-    // an assignment/submission data problem cannot break the video itself.
+    let video: any = null
+    if (lesson.videoId) {
+      try {
+        video = await db.video.findUnique({ where: { id: lesson.videoId } })
+      } catch (error) {
+        console.error('STUDENT_LESSON_VIDEO_READ_ERROR', error)
+      }
+    }
+
+    let resources: any[] = []
+    try {
+      resources = await db.lessonResource.findMany({ where: { lessonId: id } })
+    } catch (error) {
+      console.error('STUDENT_LESSON_RESOURCES_READ_ERROR', error)
+    }
+
     let assignments: any[] = []
     try {
       assignments = await db.assignment.findMany({
@@ -81,20 +107,16 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
       }
     }
 
-    const videoId = lesson.video?.isPublished
-      ? lesson.video.providerAssetId || lesson.video.youtubeUrl
-      : null
+    const videoId = video?.isPublished ? video.providerAssetId || video.youtubeUrl : null
 
     return NextResponse.json(
       {
         lesson: {
           id: lesson.id,
           title: lesson.title,
-          course: lesson.module.course.title,
-          video: videoId
-            ? { provider: lesson.video?.provider || 'YOUTUBE', id: videoId }
-            : null,
-          resources: lesson.resources,
+          course: course.title,
+          video: videoId ? { provider: video?.provider || 'YOUTUBE', id: videoId } : null,
+          resources,
           assignments: assignments.map((a) => ({
             id: a.id,
             title: a.title,
