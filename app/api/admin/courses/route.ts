@@ -52,6 +52,10 @@ export async function POST(req: Request) {
     if (!subject || !teacher) {
       return NextResponse.json({ error: 'لا توجد مادة أو مدرس مضبوطين للمنصة' }, { status: 400 })
     }
+
+    // Creating a course from the admin dashboard means it is ready to be
+    // discovered by students in the selected grade. Admins can still unpublish
+    // it later through the edit action when they intentionally want a draft.
     const course = await db.course.create({
       data: {
         title: data.title,
@@ -59,7 +63,7 @@ export async function POST(req: Request) {
         coverUrl: data.coverUrl || null,
         price: data.price,
         gradeId: data.gradeId,
-        published: data.published ?? false,
+        published: true,
         subjectId: subject.id,
         teacherId: teacher.id,
       },
