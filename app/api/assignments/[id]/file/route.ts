@@ -4,12 +4,21 @@ import { Prisma } from '@prisma/client'
 import { db } from '@/lib/db'
 import { requireRole } from '@/lib/auth'
 
+const FILE_MARKER = '\n\n[ASSIGNMENT_PDF_URL]:'
+
+function extractFileUrl(description?: string | null) {
+  const raw = description || ''
+  const index = raw.indexOf(FILE_MARKER)
+  return index === -1 ? null : raw.slice(index + FILE_MARKER.length).trim() || null
+}
+
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await requireRole(['ADMIN', 'STUDENT'])
     const { id } = await params
     const assignment = await db.assignment.findUnique({ where: { id } })
-    if (!assignment?.fileUrl) return NextResponse.json({ error: 'ملف الواجب غير موجود' }, { status: 404 })
+    const fileUrl = extractFileUrl(assignment?.description)
+    if (!assignment || !fileUrl) return NextResponse.json({ error: 'ملف الواجب غير موجود' }, { status: 404 })
 
     if (user.role === 'STUDENT') {
       if (!user.student || !assignment.courseId) return NextResponse.json({ error: 'غير متاح' }, { status: 403 })
@@ -20,7 +29,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
       if (!enrolled && !purchase.length) return NextResponse.json({ error: 'الواجب غير متاح لحسابك' }, { status: 403 })
     }
 
-    const stored = await db.uploadedFile.findFirst({ where: { url: assignment.fileUrl, mimeType: 'application/pdf' } })
+    const stored = await db.uploadedFile.findFirst({ where: { url: fileUrl, mimeType: 'application/pdf' } })
     if (!stored) return NextResponse.json({ error: 'ملف الواجب غير موجود' }, { status: 404 })
 
     const result = await get(stored.storageKey, { access: 'private', useCache: false })
@@ -29,7 +38,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
     return new NextResponse(result.stream, {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `inline; filename="assignment.pdf"`,
+        'Content-Disposition': 'inline; filename="assignment.pdf"',
         'Cache-Control': 'private, no-store',
       },
     })
