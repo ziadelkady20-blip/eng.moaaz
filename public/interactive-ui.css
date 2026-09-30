@@ -1,0 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
+:root{--ui-font:'Cairo',Arial,sans-serif}
+html,body,button,input,textarea,select{font-family:var(--ui-font)!important}
+body{transition:background-color .35s ease,color .35s ease}
+/* Scroll reveal */
+.reveal-on-scroll{opacity:0;transform:translateY(28px) scale(.985);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+.reveal-on-scroll.is-visible{opacity:1;transform:none}
+/* Interactive cards */
+.grade-card,.platform-story-card,.story-point,.stats-strip>div,.course-card,.book-card,.lesson-card,.exam-card,.assignment-card,.feature-card{transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s ease,border-color .3s ease}
+.grade-card:hover,.course-card:hover,.book-card:hover,.lesson-card:hover,.exam-card:hover,.assignment-card:hover,.feature-card:hover{transform:translateY(-8px);box-shadow:0 20px 42px rgba(55,30,80,.13)}
+.grade-card:active,.course-card:active,.book-card:active,.lesson-card:active,.exam-card:active,.assignment-card:active,.feature-card:active{transform:translateY(-3px) scale(.99)}
+/* Buttons */
+.hero-primary,.hero-secondary,.story-primary,.story-secondary,.header-register,.header-login,button,a[role="button"]{transition:transform .2s ease,box-shadow .25s ease,filter .25s ease}
+.hero-primary:hover,.story-primary:hover,.header-register:hover{transform:translateY(-3px) scale(1.02);filter:saturate(1.08);box-shadow:0 14px 30px rgba(109,47,163,.25)}
+.hero-secondary:hover,.story-secondary:hover,.header-login:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(50,35,65,.09)}
+/* Click ripple */
+.ui-ripple{position:fixed;pointer-events:none;width:18px;height:18px;border-radius:50%;background:rgba(109,47,163,.22);transform:translate(-50%,-50%) scale(0);animation:uiRipple .65s ease-out forwards;z-index:99999}
+@keyframes uiRipple{to{transform:translate(-50%,-50%) scale(9);opacity:0}}
+/* Subtle cursor glow */
+.cursor-glow{position:fixed;pointer-events:none;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(109,47,163,.08),transparent 68%);transform:translate(-50%,-50%);z-index:0;opacity:0;transition:opacity .25s ease}
+@media (pointer:fine){body:hover .cursor-glow{opacity:1}}
+/* Focus accessibility */
+:focus-visible{outline:3px solid rgba(109,47,163,.3);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}.reveal-on-scroll{opacity:1;transform:none}}
