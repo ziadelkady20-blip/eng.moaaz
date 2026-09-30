@@ -18,7 +18,7 @@ function packDescription(description?: string | null, fileUrl?: string | null) {
   return fileUrl ? `${clean}${FILE_MARKER}${fileUrl}` : (clean || null)
 }
 
-export function unpackDescription(description?: string | null) {
+function unpackDescription(description?: string | null) {
   const raw = description || ''
   const index = raw.indexOf(FILE_MARKER)
   if (index === -1) return { description: raw, fileUrl: null as string | null }
