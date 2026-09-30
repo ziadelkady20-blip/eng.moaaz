@@ -8,20 +8,15 @@ export async function GET(){
     const user=await requireRole(['STUDENT'])
     if(!user.student) return NextResponse.json({error:'الحساب غير مرتبط ببيانات طالب'},{status:401})
 
-    // Always read the student's current grade from the database.
-    // Never fall back to showing all courses when gradeId is missing.
-    const studentRows=await db.$queryRaw<any[]>(Prisma.sql`
-      SELECT "id","gradeId"
-      FROM "Student"
-      WHERE "userId"=${user.id}
-      LIMIT 1
-    `)
-    const student=studentRows[0]
+    const student=await db.student.findUnique({
+      where:{userId:user.id},
+      include:{grade:{select:{id:true,name:true}}},
+    })
     if(!student) return NextResponse.json({error:'بيانات الطالب غير موجودة'},{status:404})
-    if(!student.gradeId) return NextResponse.json({courses:[],gradeId:null,gradeName:null})
+    if(!student.grade) return NextResponse.json({courses:[],gradeId:null,gradeName:null})
 
     const courses=await db.course.findMany({
-      where:{published:true,gradeId:student.gradeId},
+      where:{published:true,grade:{name:student.grade.name}},
       include:{grade:true,subject:true,teacher:{include:{user:true}},modules:{include:{lessons:true},orderBy:{order:'asc'}}},
       orderBy:{createdAt:'desc'}
     })
@@ -34,10 +29,9 @@ export async function GET(){
     ])
     const enrolledIds=new Set(enrolled.map(x=>x.courseId)); purchases.forEach(x=>enrolledIds.add(x.courseId))
     const progressByLesson=new Map(progress.map(x=>[x.lessonId,x]))
-    const grade=await db.grade.findUnique({where:{id:student.gradeId},select:{id:true,name:true}})
     return NextResponse.json({
-      gradeId:student.gradeId,
-      gradeName:grade?.name??null,
+      gradeId:student.grade.id,
+      gradeName:student.grade.name,
       courses:courses.map(c=>{
         const lessonIds=c.modules.flatMap(m=>m.lessons.map(l=>l.id))
         const ps=lessonIds.map(id=>progressByLesson.get(id)).filter(Boolean) as Array<{watchedPct:number;completed:boolean}>
@@ -46,5 +40,8 @@ export async function GET(){
         return {id:c.id,title:c.title,description:c.description,coverUrl:coverById.get(c.id)??null,price:Number(c.price),grade:c.grade.name,subject:c.subject.name,teacher:c.teacher.user.name,lessons:lessonIds.length,enrolled:enrolledIds.has(c.id),progress:progressPct,completedLessons}
       })
     })
-  }catch(e){ console.error('COURSES_GET_ERROR',e); return NextResponse.json({error:'تعذر تحميل الكورسات'},{status:500}) }
+  }catch(e){
+    console.error('COURSES_GET_ERROR',e)
+    return NextResponse.json({error:'تعذر تحميل الكورسات'},{status:500})
+  }
 }
