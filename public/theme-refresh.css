@@ -69,11 +69,12 @@ body{background:#f8f7f2;color:#17253d}
 /* Student dashboard: neutralize legacy purple utility classes. */
 .student-shell{background:#f8f7f2!important;color:#17253d}
 [class*="6d2fa3"]{background-color:#f47b16!important;color:#fff!important}
-[class*="432067"]{background-color:#17253d!important}
+[class*="432067"]{background:linear-gradient(135deg,#17253d 0%,#243653 55%,#f47b16 100%)!important}
 [class*="8d54bd"]{background-color:#f47b16!important}
 [class*="5c2889"]{color:#17253d!important}
 [class*="5b287f"]{color:#17253d!important}
 [class*="f4ecfa"]{background:#fff0d8!important}
+[class*="f3eafa"]{background:linear-gradient(135deg,#fff0d8,#fffdf9)!important}
 [class*="faf6fd"]{background:#fffaf4!important}
 [class*="faf7fd"]{background:#fffaf4!important}
 [class*="e9e1ee"]{background:#e8e3da!important}
@@ -91,3 +92,7 @@ body{background:#f8f7f2;color:#17253d}
 @keyframes orbitPremium{0%,100%{opacity:.35;transform:translate(-50%,-50%) rotate(-7deg) scale(1)}50%{opacity:.8;transform:translate(-50%,-50%) rotate(2deg) scale(1.05)}}
 
 @media(prefers-reduced-motion:reduce){.feature-card,.hero-art,.hero-orbit{animation:none!important}.grade-card,.feature-card{transition:none!important}}
+
+/* Final pass: catch legacy Tailwind purple tokens in student pages. */
+[class*="a15ee5"],[class*="7c3aed"],[class*="9c62dd"],[class*="f2e8fb"],[class*="f2eafa"],[class*="f0e7fb"],[class*="f7f1fc"]{background:#fff0d8!important;color:#f47b16!important}
+[class*="rgba(109,47,163"],[class*="rgba(124,58,237"]{background:rgba(244,123,22,.12)!important}
