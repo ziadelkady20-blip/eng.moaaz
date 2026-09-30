@@ -3,6 +3,8 @@ import { db } from '@/lib/db'
 import { requireRole } from '@/lib/auth'
 import { z } from 'zod'
 
+const FILE_MARKER = '\n\n[ASSIGNMENT_PDF_URL]:'
+
 const schema = z.object({
   lessonId: z.string().min(1).optional(),
   title: z.string().trim().min(2).max(200).optional(),
@@ -10,6 +12,11 @@ const schema = z.object({
   dueAt: z.coerce.date().optional(),
   fileUrl: z.string().url().optional().or(z.literal('')),
 })
+
+function packDescription(description?: string | null, fileUrl?: string | null) {
+  const clean = (description || '').split(FILE_MARKER)[0].trim()
+  return fileUrl ? `${clean}${FILE_MARKER}${fileUrl}` : (clean || null)
+}
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -21,15 +28,23 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
     const updateData: any = {}
     if (data.title !== undefined) updateData.title = data.title
-    if (data.description !== undefined) updateData.description = data.description || null
     if (data.dueAt !== undefined) updateData.dueAt = data.dueAt
-    if (data.fileUrl !== undefined) {
-      if (data.fileUrl) {
-        const file = await db.uploadedFile.findFirst({ where: { url: data.fileUrl, ownerId: actor.id, mimeType: 'application/pdf' } })
-        if (!file) return NextResponse.json({ error: 'ملف الواجب غير صالح' }, { status: 400 })
+
+    if (data.description !== undefined || data.fileUrl !== undefined) {
+      const old = existing.description || ''
+      const oldIndex = old.indexOf(FILE_MARKER)
+      const oldDescription = oldIndex === -1 ? old : old.slice(0, oldIndex).trim()
+      const oldFileUrl = oldIndex === -1 ? null : old.slice(oldIndex + FILE_MARKER.length).trim() || null
+      const nextDescription = data.description !== undefined ? data.description : oldDescription
+      const nextFileUrl = data.fileUrl !== undefined ? (data.fileUrl || null) : oldFileUrl
+
+      if (nextFileUrl) {
+        const file = await db.uploadedFile.findFirst({ where: { url: nextFileUrl, ownerId: actor.id, mimeType: 'application/pdf' } })
+        if (!file && nextFileUrl !== oldFileUrl) return NextResponse.json({ error: 'ملف الواجب غير صالح' }, { status: 400 })
       }
-      updateData.fileUrl = data.fileUrl || null
+      updateData.description = packDescription(nextDescription, nextFileUrl)
     }
+
     if (data.lessonId !== undefined) {
       const lesson = await db.lesson.findUnique({ where: { id: data.lessonId }, include: { module: { select: { courseId: true } } } })
       if (!lesson) return NextResponse.json({ error: 'الدرس غير موجود' }, { status: 404 })
