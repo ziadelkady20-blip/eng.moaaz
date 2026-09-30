@@ -3,14 +3,7 @@ import DashboardShell from '@/components/DashboardShell'
 import { useEffect, useRef, useState } from 'react'
 
 type WalletData = { balance:number; transactions:any[]; recharges:any[] }
-const methods = [
-  ['INSTAPAY','InstaPay','⚡'],
-  ['VODAFONE_CASH','Vodafone Cash','◉'],
-  ['ETISALAT_CASH','Etisalat Cash','◌'],
-  ['ORANGE_CASH','Orange Cash','●'],
-  ['BANK_TRANSFER','تحويل بنكي','▣'],
-  ['OTHER','أخرى','＋'],
-]
+const methods = [['INSTAPAY','InstaPay','⚡'],['VODAFONE_CASH','Vodafone Cash','◉'],['ETISALAT_CASH','Etisalat Cash','◌'],['ORANGE_CASH','Orange Cash','●'],['BANK_TRANSFER','تحويل بنكي','▣'],['OTHER','أخرى','＋']]
 const MAX_PROOF_BYTES = 2 * 1024 * 1024
 
 export default function WalletPage(){
@@ -22,110 +15,37 @@ export default function WalletPage(){
   const [error,setError] = useState('')
   const [form,setForm] = useState({amount:'',method:'INSTAPAY',senderPhone:'',proof:null as File|null})
   const proofRef = useRef<HTMLInputElement>(null)
-
-  const load = async()=>{
-    try{
-      setError('')
-      const r = await fetch('/api/student/wallet',{cache:'no-store'})
-      const x = await r.json()
-      if(!r.ok) throw new Error(x.error || 'تعذر تحميل المحفظة')
-      setD(x)
-    }catch(e:any){ setError(e.message) }
-    finally{ setLoading(false); setRefreshing(false) }
-  }
-  useEffect(()=>{ load() },[])
-  async function refresh(){ setRefreshing(true); await load() }
-
-  function chooseProof(file:File|null){
-    setError('')
-    if(!file){ setForm(f=>({...f,proof:null})); return }
-    if(!file.type.startsWith('image/')){
-      setForm(f=>({...f,proof:null}));
-      if(proofRef.current) proofRef.current.value=''
-      setError('إثبات التحويل يجب أن يكون صورة'); return
-    }
-    if(file.size>MAX_PROOF_BYTES){
-      setForm(f=>({...f,proof:null}));
-      if(proofRef.current) proofRef.current.value=''
-      setError('حجم الصورة يجب ألا يتجاوز 2MB'); return
-    }
-    setForm(f=>({...f,proof:file}))
-  }
-
-  async function recharge(e:any){
-    e.preventDefault(); setSending(true); setError(''); setMessage('')
-    try{
-      if(!form.proof) throw new Error('ارفع صورة إثبات التحويل')
-      const amount = Number(form.amount)
-      if(!Number.isFinite(amount)||amount<=0||amount>100000) throw new Error('أدخل مبلغ شحن صحيح')
-      if(!/^01\d{9}$/.test(form.senderPhone.trim())) throw new Error('رقم الهاتف المحول منه مطلوب ويجب أن يكون صحيحًا')
-      const fd = new FormData()
-      fd.append('amount',form.amount); fd.append('method',form.method); fd.append('senderPhone',form.senderPhone.trim()); fd.append('proof',form.proof)
-      const r = await fetch('/api/student/wallet/recharge',{method:'POST',body:fd,credentials:'same-origin'})
-      const x = await r.json()
-      if(!r.ok) throw new Error(x.error||'تعذر إرسال طلب الشحن')
-      setMessage('تم إرسال طلب الشحن للمراجعة بنجاح.')
-      setForm({amount:'',method:form.method,senderPhone:'',proof:null})
-      if(proofRef.current) proofRef.current.value=''
-      await load()
-    }catch(e:any){ setError(e.message) }
-    finally{ setSending(false) }
-  }
-
-  return <DashboardShell title="المحفظة">
+  const load = async()=>{try{setError('');const r=await fetch('/api/student/wallet',{cache:'no-store'});const x=await r.json();if(!r.ok)throw new Error(x.error||'تعذر تحميل المحفظة');setD(x)}catch(e:any){setError(e.message)}finally{setLoading(false);setRefreshing(false)}}
+  useEffect(()=>{load()},[])
+  async function refresh(){setRefreshing(true);await load()}
+  function chooseProof(file:File|null){setError('');if(!file){setForm(f=>({...f,proof:null}));return}if(!file.type.startsWith('image/')){setForm(f=>({...f,proof:null}));if(proofRef.current)proofRef.current.value='';setError('إثبات التحويل يجب أن يكون صورة');return}if(file.size>MAX_PROOF_BYTES){setForm(f=>({...f,proof:null}));if(proofRef.current)proofRef.current.value='';setError('حجم الصورة يجب ألا يتجاوز 2MB');return}setForm(f=>({...f,proof:file}))}
+  async function recharge(e:any){e.preventDefault();setSending(true);setError('');setMessage('');try{if(!form.proof)throw new Error('ارفع صورة إثبات التحويل');const amount=Number(form.amount);if(!Number.isFinite(amount)||amount<=0||amount>100000)throw new Error('أدخل مبلغ شحن صحيح');if(!/^01\d{9}$/.test(form.senderPhone.trim()))throw new Error('رقم الهاتف المحول منه مطلوب ويجب أن يكون صحيحًا');const fd=new FormData();fd.append('amount',form.amount);fd.append('method',form.method);fd.append('senderPhone',form.senderPhone.trim());fd.append('proof',form.proof);const r=await fetch('/api/student/wallet/recharge',{method:'POST',body:fd,credentials:'same-origin'});const x=await r.json();if(!r.ok)throw new Error(x.error||'تعذر إرسال طلب الشحن');setMessage('تم إرسال طلب الشحن للمراجعة بنجاح.');setForm({amount:'',method:form.method,senderPhone:'',proof:null});if(proofRef.current)proofRef.current.value='';await load()}catch(e:any){setError(e.message)}finally{setSending(false)}}
+  return <DashboardShell title="المحفظة"><style>{`
+    .wallet-page{--wallet-navy:#17253d;--wallet-navy-2:#243653;--wallet-orange:#f47b16;--wallet-orange-dark:#dc6508;--wallet-bg:#f8f7f3;--wallet-card:#fffdf9;--wallet-line:#e9e5dc;--wallet-text:#17253d;--wallet-muted:#777b83;direction:rtl}
+    .wallet-page{color:var(--wallet-text)}
+    .wallet-eyebrow{font-size:12px;font-weight:900;color:var(--wallet-orange);margin-bottom:7px}
+    .wallet-muted,.wallet-section-head p{color:var(--wallet-muted);font-size:13px;font-weight:600}
+    .wallet-refresh{height:44px;padding:0 18px;border:1px solid #dcd8cf;background:#fff;border-radius:13px;display:inline-flex;align-items:center;gap:9px;font-weight:900;color:var(--wallet-navy);box-shadow:0 5px 15px rgba(23,37,61,.05);transition:.2s}
+    .wallet-refresh:hover{border-color:#f0b47e;transform:translateY(-1px)}.wallet-refresh:disabled{opacity:.6}.wallet-spin{display:inline-block;animation:walletSpin .8s linear infinite}@keyframes walletSpin{to{transform:rotate(360deg)}}
+    .wallet-balance-card{min-height:250px;border-radius:24px;padding:27px;background:linear-gradient(145deg,var(--wallet-navy),var(--wallet-navy-2));color:#fff;position:relative;overflow:hidden;box-shadow:0 18px 40px rgba(23,37,61,.15)}
+    .wallet-balance-card:before{content:"";position:absolute;width:230px;height:230px;border-radius:50%;left:-100px;bottom:-140px;background:rgba(244,123,22,.22)}.wallet-balance-card:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;right:-80px;top:-110px;border:35px solid rgba(255,255,255,.035)}
+    .wallet-balance-top,.wallet-balance-bottom{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;gap:10px}.wallet-balance-top{font-size:13px;font-weight:800;color:#dce3ed}.wallet-lock{font-size:11px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.1);padding:6px 9px;border-radius:99px}.wallet-lock:first-letter{color:#55c98a}
+    .wallet-balance-number{position:relative;z-index:1;font-size:46px;line-height:1;font-weight:950;margin-top:38px;letter-spacing:-1px}.wallet-balance-number small{font-size:16px;font-weight:800;color:#e6ebf1}.wallet-balance-line{height:1px;background:rgba(255,255,255,.12);margin:30px 0 15px;position:relative;z-index:1}.wallet-balance-bottom{font-size:11px;color:#bdc8d6}
+    .wallet-card{background:var(--wallet-card);border:1px solid var(--wallet-line);border-radius:22px;box-shadow:0 10px 28px rgba(23,37,61,.055)}.wallet-form{padding:23px}.wallet-section-head{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:19px}.wallet-section-head h2{font-size:20px;font-weight:950;margin:0;color:var(--wallet-navy)}.wallet-head-icon{width:40px;height:40px;border-radius:12px;background:#fff0e5;color:var(--wallet-orange);display:grid;place-items:center;font-size:23px;font-weight:900}.wallet-count{min-width:34px;height:30px;padding:0 9px;border-radius:99px;background:#f5f1e9;color:var(--wallet-navy);display:grid;place-items:center;font-size:12px;font-weight:900}
+    .wallet-field{display:block}.wallet-field>span{display:block;font-size:12px;font-weight:900;color:#39445a;margin:0 0 8px}.wallet-input-wrap{position:relative}.wallet-input-wrap b{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:11px;color:#8a8f98}.wallet-field input,.wallet-field select{width:100%;height:47px;border:1px solid #dcd9d1;background:#fff;border-radius:12px;padding:0 14px;color:var(--wallet-navy);outline:none;font-weight:700;transition:.2s}.wallet-field input:focus{border-color:#f1a565;box-shadow:0 0 0 4px rgba(244,123,22,.1)}
+    .wallet-methods{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.wallet-method{height:48px;border:1px solid #e2ded6;background:#fff;border-radius:11px;display:flex;align-items:center;justify-content:flex-start;gap:8px;padding:0 10px;color:#4d5665;font-size:11px;font-weight:850;transition:.18s}.wallet-method i{width:27px;height:27px;border-radius:8px;background:#f5f2ec;display:grid;place-items:center;font-style:normal;color:#586273}.wallet-method:hover{border-color:#f2b27e;transform:translateY(-1px)}.wallet-method.selected{border-color:var(--wallet-orange);background:#fff7f0;color:var(--wallet-navy);box-shadow:0 5px 12px rgba(244,123,22,.08)}.wallet-method.selected i{background:#ffead9;color:var(--wallet-orange)}
+    .wallet-upload{min-height:78px;border:1.5px dashed #d8d4ca;background:#faf9f6;border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;text-align:center;position:relative;overflow:hidden;transition:.2s}.wallet-upload:hover,.wallet-upload.has-file{border-color:#ef9b58;background:#fff8f2}.wallet-upload input{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;opacity:0;cursor:pointer}.wallet-upload strong{font-size:12px;color:var(--wallet-navy)}.wallet-upload small{font-size:10px;color:#8b8f95;margin-top:4px;max-width:90%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .wallet-submit{width:100%;height:49px;border:0;border-radius:13px;background:var(--wallet-orange);color:#fff;font-size:14px;font-weight:950;box-shadow:0 10px 20px rgba(244,123,22,.2);transition:.2s}.wallet-submit:hover{background:var(--wallet-orange-dark);transform:translateY(-1px)}.wallet-submit:disabled{opacity:.6;cursor:not-allowed;transform:none}.wallet-submit span{margin-right:7px}.wallet-alert{margin-top:10px;padding:11px 13px;border-radius:11px;font-size:12px;font-weight:800}.wallet-alert.success{background:#edf9f2;color:#21804b}.wallet-alert.error{background:#fff0ef;color:#b33b33}
+    .wallet-mini{background:#fffdf9;border:1px solid var(--wallet-line);border-radius:17px;padding:15px;display:flex;align-items:center;gap:12px;box-shadow:0 7px 20px rgba(23,37,61,.035)}.wallet-mini-icon{width:40px;height:40px;border-radius:12px;background:#fff0e5;color:var(--wallet-orange);display:grid;place-items:center;font-weight:950;font-size:17px}.wallet-mini small{display:block;color:#858a92;font-size:11px;font-weight:700}.wallet-mini strong{display:block;color:var(--wallet-navy);font-size:17px;font-weight:950;margin-top:2px}
+    .wallet-list-card{padding:21px}.wallet-list{display:flex;flex-direction:column;gap:8px}.wallet-row{min-height:68px;border:1px solid #ece8e0;background:#fff;border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:11px}.wallet-row-icon{width:37px;height:37px;flex:0 0 37px;border-radius:11px;background:#eef8f2;color:#2c9b5e;display:grid;place-items:center;font-weight:950}.wallet-row-icon.minus{background:#fff0ef;color:#d25a50}.wallet-row-main{min-width:0;flex:1}.wallet-row-main b{display:block;color:var(--wallet-navy);font-size:12px;font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.wallet-row-main small{display:block;color:#8b8f96;font-size:9px;margin-top:4px}.wallet-status{padding:6px 9px;border-radius:99px;font-size:9px;font-weight:900;white-space:nowrap}.wallet-status.approved{background:#eaf8ef;color:#24834c}.wallet-status.pending{background:#fff5df;color:#a76a10}.wallet-status.rejected{background:#fff0ef;color:#b23c34}.wallet-positive{color:#25975b;font-size:12px;white-space:nowrap}.wallet-negative{color:#c54d45;font-size:12px;white-space:nowrap}.wallet-empty{padding:35px 10px;text-align:center;color:#8b8f96}.wallet-empty span{display:block;font-size:30px;color:#c5c7ca;margin-bottom:8px}.wallet-empty b{display:block;color:#4b5565;font-size:12px}.wallet-empty small{display:block;font-size:10px;margin-top:4px}
+    @media(max-width:700px){.wallet-methods{grid-template-columns:repeat(2,1fr)}.wallet-balance-number{font-size:38px}.wallet-balance-bottom{flex-direction:column;align-items:flex-start}.wallet-form{padding:17px}.wallet-list-card{padding:16px}}
+  `}</style>
     <div className="wallet-page space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <div className="wallet-eyebrow">الحساب المالي</div>
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight">المحفظة</h1>
-          <p className="wallet-muted mt-2">اشحن رصيدك واشترِ الكورسات المتاحة لصفك بسهولة وأمان.</p>
-        </div>
-        <button type="button" onClick={refresh} disabled={loading||refreshing} className="wallet-refresh">
-          <span className={refreshing?'wallet-spin':''}>↻</span>{refreshing?'جاري التحديث...':'تحديث الرصيد'}
-        </button>
-      </div>
-
-      <div className="grid lg:grid-cols-[1.05fr_1.95fr] gap-5 items-stretch">
-        <section className="wallet-balance-card">
-          <div className="wallet-balance-top"><span>الرصيد المتاح</span><span className="wallet-lock">● آمن</span></div>
-          <div className="wallet-balance-number">{loading?'—':d.balance.toFixed(2)} <small>ج.م</small></div>
-          <div className="wallet-balance-line" />
-          <div className="wallet-balance-bottom"><span>جاهز لشراء الكورسات</span><span>رصيدك يُحدّث بعد اعتماد التحويل</span></div>
-        </section>
-
-        <form onSubmit={recharge} className="wallet-card wallet-form">
-          <div className="wallet-section-head">
-            <div><h2>شحن المحفظة</h2><p>أرسل بيانات التحويل وسنراجع الطلب.</p></div>
-            <div className="wallet-head-icon">+</div>
-          </div>
-          <div className="grid md:grid-cols-2 gap-3">
-            <label className="wallet-field md:col-span-1"><span>المبلغ</span><div className="wallet-input-wrap"><input required min="1" max="100000" step="0.01" type="number" placeholder="مثال: 100" value={form.amount} onChange={e=>setForm({...form,amount:e.target.value})}/><b>ج.م</b></div></label>
-            <label className="wallet-field"><span>رقم الهاتف المحول منه</span><input required type="tel" inputMode="numeric" pattern="01[0-9]{9}" maxLength={11} placeholder="01xxxxxxxxx" value={form.senderPhone} onChange={e=>setForm({...form,senderPhone:e.target.value.replace(/[^0-9]/g,'').slice(0,11)})}/></label>
-          </div>
-          <div className="wallet-field"><span>طريقة التحويل</span><div className="wallet-methods">{methods.map(x=><button key={x[0]} type="button" onClick={()=>setForm({...form,method:x[0]})} className={`wallet-method ${form.method===x[0]?'selected':''}`}><i>{x[2]}</i><span>{x[1]}</span></button>)}</div></div>
-          <div className="wallet-field"><span>إثبات التحويل</span><label className={`wallet-upload ${form.proof?'has-file':''}`}><input ref={proofRef} required type="file" accept="image/*" onChange={e=>chooseProof(e.target.files?.[0]||null)}/><strong>{form.proof?'✓ تم اختيار صورة الإثبات':'↑ ارفع صورة إثبات التحويل'}</strong><small>{form.proof?form.proof.name:'PNG / JPG — الحد الأقصى 2MB'}</small></label></div>
-          <button type="submit" disabled={sending} className="wallet-submit">{sending?'جاري إرسال الطلب...':'إرسال طلب الشحن'} <span>←</span></button>
-          {message&&<div className="wallet-alert success">✓ {message}</div>}
-          {error&&<div className="wallet-alert error">! {error}</div>}
-        </form>
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-4">
-        <div className="wallet-mini"><span className="wallet-mini-icon">↗</span><div><small>طلبات الشحن</small><strong>{d.recharges.length}</strong></div></div>
-        <div className="wallet-mini"><span className="wallet-mini-icon">↔</span><div><small>حركات المحفظة</small><strong>{d.transactions.length}</strong></div></div>
-        <div className="wallet-mini"><span className="wallet-mini-icon">✓</span><div><small>حالة الحساب</small><strong>نشط</strong></div></div>
-      </div>
-
-      <div className="grid lg:grid-cols-2 gap-5">
-        <section className="wallet-card wallet-list-card">
-          <div className="wallet-section-head"><div><h2>طلبات الشحن</h2><p>آخر عمليات شحن الرصيد.</p></div><span className="wallet-count">{d.recharges.length}</span></div>
-          <div className="wallet-list">{d.recharges.map(r=><div key={r.id} className="wallet-row"><div className="wallet-row-icon">↑</div><div className="wallet-row-main"><b>{Number(r.amount).toFixed(2)} ج.م</b><small>{new Date(r.createdAt).toLocaleString('ar-EG')}</small></div><span className={`wallet-status ${r.status==='APPROVED'?'approved':r.status==='REJECTED'?'rejected':'pending'}`}>{r.status==='APPROVED'?'مقبول':r.status==='REJECTED'?'مرفوض':'قيد المراجعة'}</span></div>)}{!d.recharges.length&&<div className="wallet-empty"><span>○</span><b>لا توجد طلبات شحن</b><small>طلباتك الجديدة ستظهر هنا.</small></div>}</div>
-        </section>
-        <section className="wallet-card wallet-list-card">
-          <div className="wallet-section-head"><div><h2>حركة المحفظة</h2><p>تفاصيل الإضافات والخصومات على الرصيد.</p></div><span className="wallet-count">{d.transactions.length}</span></div>
-          <div className="wallet-list">{d.transactions.map(t=><div key={t.id} className="wallet-row"><div className={`wallet-row-icon ${Number(t.amount)<0?'minus':''}`}>{Number(t.amount)>=0?'↑':'↓'}</div><div className="wallet-row-main"><b>{t.description}</b><small>{new Date(t.createdAt).toLocaleString('ar-EG')}</small></div><strong className={Number(t.amount)>=0?'wallet-positive':'wallet-negative'}>{Number(t.amount)>=0?'+':''}{Number(t.amount).toFixed(2)} ج.م</strong></div>)}{!d.transactions.length&&<div className="wallet-empty"><span>○</span><b>لا توجد حركات حتى الآن</b><small>ستظهر هنا كل حركة على رصيدك.</small></div>}</div>
-        </section>
-      </div>
+      <div className="flex flex-wrap items-end justify-between gap-4"><div><div className="wallet-eyebrow">الحساب المالي</div><h1 className="text-3xl md:text-4xl font-black tracking-tight">المحفظة</h1><p className="wallet-muted mt-2">اشحن رصيدك واشترِ الكورسات المتاحة لصفك بسهولة وأمان.</p></div><button type="button" onClick={refresh} disabled={loading||refreshing} className="wallet-refresh"><span className={refreshing?'wallet-spin':''}>↻</span>{refreshing?'جاري التحديث...':'تحديث الرصيد'}</button></div>
+      <div className="grid lg:grid-cols-[1.05fr_1.95fr] gap-5 items-stretch"><section className="wallet-balance-card"><div className="wallet-balance-top"><span>الرصيد المتاح</span><span className="wallet-lock">● آمن</span></div><div className="wallet-balance-number">{loading?'—':d.balance.toFixed(2)} <small>ج.م</small></div><div className="wallet-balance-line"/><div className="wallet-balance-bottom"><span>جاهز لشراء الكورسات</span><span>رصيدك يُحدّث بعد اعتماد التحويل</span></div></section>
+        <form onSubmit={recharge} className="wallet-card wallet-form"><div className="wallet-section-head"><div><h2>شحن المحفظة</h2><p>أرسل بيانات التحويل وسنراجع الطلب.</p></div><div className="wallet-head-icon">+</div></div><div className="grid md:grid-cols-2 gap-3"><label className="wallet-field"><span>المبلغ</span><div className="wallet-input-wrap"><input required min="1" max="100000" step="0.01" type="number" placeholder="مثال: 100" value={form.amount} onChange={e=>setForm({...form,amount:e.target.value})}/><b>ج.م</b></div></label><label className="wallet-field"><span>رقم الهاتف المحول منه</span><input required type="tel" inputMode="numeric" pattern="01[0-9]{9}" maxLength={11} placeholder="01xxxxxxxxx" value={form.senderPhone} onChange={e=>setForm({...form,senderPhone:e.target.value.replace(/[^0-9]/g,'').slice(0,11)})}/></label></div><div className="wallet-field"><span>طريقة التحويل</span><div className="wallet-methods">{methods.map(x=><button key={x[0]} type="button" onClick={()=>setForm({...form,method:x[0]})} className={`wallet-method ${form.method===x[0]?'selected':''}`}><i>{x[2]}</i><span>{x[1]}</span></button>)}</div></div><div className="wallet-field"><span>إثبات التحويل</span><label className={`wallet-upload ${form.proof?'has-file':''}`}><input ref={proofRef} required type="file" accept="image/*" onChange={e=>chooseProof(e.target.files?.[0]||null)}/><strong>{form.proof?'✓ تم اختيار صورة الإثبات':'↑ ارفع صورة إثبات التحويل'}</strong><small>{form.proof?form.proof.name:'PNG / JPG — الحد الأقصى 2MB'}</small></label></div><button type="submit" disabled={sending} className="wallet-submit">{sending?'جاري إرسال الطلب...':'إرسال طلب الشحن'} <span>←</span></button>{message&&<div className="wallet-alert success">✓ {message}</div>}{error&&<div className="wallet-alert error">! {error}</div>}</form></div>
+      <div className="grid md:grid-cols-3 gap-4"><div className="wallet-mini"><span className="wallet-mini-icon">↗</span><div><small>طلبات الشحن</small><strong>{d.recharges.length}</strong></div></div><div className="wallet-mini"><span className="wallet-mini-icon">↔</span><div><small>حركات المحفظة</small><strong>{d.transactions.length}</strong></div></div><div className="wallet-mini"><span className="wallet-mini-icon">✓</span><div><small>حالة الحساب</small><strong>نشط</strong></div></div></div>
+      <div className="grid lg:grid-cols-2 gap-5"><section className="wallet-card wallet-list-card"><div className="wallet-section-head"><div><h2>طلبات الشحن</h2><p>آخر عمليات شحن الرصيد.</p></div><span className="wallet-count">{d.recharges.length}</span></div><div className="wallet-list">{d.recharges.map(r=><div key={r.id} className="wallet-row"><div className="wallet-row-icon">↑</div><div className="wallet-row-main"><b>{Number(r.amount).toFixed(2)} ج.م</b><small>{new Date(r.createdAt).toLocaleString('ar-EG')}</small></div><span className={`wallet-status ${r.status==='APPROVED'?'approved':r.status==='REJECTED'?'rejected':'pending'}`}>{r.status==='APPROVED'?'مقبول':r.status==='REJECTED'?'مرفوض':'قيد المراجعة'}</span></div>)}{!d.recharges.length&&<div className="wallet-empty"><span>○</span><b>لا توجد طلبات شحن</b><small>طلباتك الجديدة ستظهر هنا.</small></div>}</div></section><section className="wallet-card wallet-list-card"><div className="wallet-section-head"><div><h2>حركة المحفظة</h2><p>تفاصيل الإضافات والخصومات على الرصيد.</p></div><span className="wallet-count">{d.transactions.length}</span></div><div className="wallet-list">{d.transactions.map(t=><div key={t.id} className="wallet-row"><div className={`wallet-row-icon ${Number(t.amount)<0?'minus':''}`}>{Number(t.amount)>=0?'↑':'↓'}</div><div className="wallet-row-main"><b>{t.description}</b><small>{new Date(t.createdAt).toLocaleString('ar-EG')}</small></div><strong className={Number(t.amount)>=0?'wallet-positive':'wallet-negative'}>{Number(t.amount)>=0?'+':''}{Number(t.amount).toFixed(2)} ج.م</strong></div>)}{!d.transactions.length&&<div className="wallet-empty"><span>○</span><b>لا توجد حركات حتى الآن</b><small>ستظهر هنا كل حركة على رصيدك.</small></div>}</div></section></div>
     </div>
   </DashboardShell>
 }
