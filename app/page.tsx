@@ -2,8 +2,6 @@
 
 import Link from 'next/link'
 import { ArrowLeft, BookOpen, CheckCircle2, ClipboardCheck, Code2, GraduationCap, Sparkles, Target, Users } from 'lucide-react'
-import HomeAuthHeader from '@/components/HomeAuthHeader'
-import WhatsAppContact from '@/components/WhatsAppContact'
 
 const grades=[
   {title:'الصف الأول الثانوي',subtitle:'شرح البرمجة من الأساسيات لحد التطبيق العملي.',label:'أولى ثانوي'},
@@ -19,7 +17,6 @@ const features=[
 
 export default function Home(){
  return <main className="landing-page" style={{background:'#f8f7f2',color:'#17243a'}}>
-  <HomeAuthHeader/>
   <section className="relative overflow-hidden" style={{background:'radial-gradient(circle at 15% 35%,#fff0d8 0,transparent 32%),linear-gradient(180deg,#fffdf8 0%,#f8f7f2 100%)'}}>
    <div className="absolute -left-24 top-20 h-80 w-80 rounded-full bg-[#ffe8c2] blur-3xl opacity-70"/>
    <div className="mx-auto grid min-h-[680px] w-[min(1380px,calc(100%-40px))] items-center gap-8 lg:grid-cols-[1fr_1.05fr]">
@@ -62,6 +59,5 @@ export default function Home(){
   <section id="about" className="bg-[#f8f7f2] px-5 py-16"><div className="mx-auto max-w-4xl rounded-[30px] border border-[#e8e4dc] bg-white p-8 text-center shadow-[0_18px_45px_rgba(23,36,58,.07)]"><div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#17243a] text-white"><Code2/></div><h2 className="mt-5 text-3xl font-black text-[#17243a]">مع الباشمهندس معاذ — البرمجة هتبقى أوضح</h2><p className="mx-auto mt-3 max-w-2xl font-semibold leading-8 text-[#777e8a]">اتعلم، طبّق، حل واجبات، اختبر نفسك، وتابع تقدمك خطوة بخطوة.</p></div></section>
 
   <footer className="border-t border-[#e8e4dc] bg-[#fffdf8] px-5 py-12"><div className="mx-auto flex w-[min(1240px,100%)] flex-col items-center justify-between gap-5 md:flex-row"><div className="flex items-center gap-3"><img src="/logo.png" alt="معاذ" className="h-14 w-14 rounded-2xl object-contain"/><div><b className="block text-lg font-black text-[#17243a]">الباشمهندس معاذ</b><span className="text-xs font-bold text-[#8b9099]">منصة شرح مادة البرمجة</span></div></div><div className="flex gap-5 text-sm font-black text-[#514f55]"><Link href="/register">إنشاء حساب</Link><Link href="/login">تسجيل الدخول</Link><Link href="/student/exams">الامتحانات</Link></div></div></footer>
-  <WhatsAppContact/>
  </main>
 }
