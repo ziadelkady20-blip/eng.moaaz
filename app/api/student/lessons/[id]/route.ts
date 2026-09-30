@@ -8,21 +8,21 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
     if (!user?.student) return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
 
     const { id } = await params
+
+    // Keep the core lesson query small and independent from the optional
+    // assignment/submission data. This prevents a problem in the assignment
+    // tables from taking the whole lesson/video page down with a 500.
     const lesson = await db.lesson.findUnique({
       where: { id },
       include: {
         module: { include: { course: true } },
         video: true,
         resources: true,
-        assignments: { orderBy: { dueAt: 'asc' } },
       },
     })
 
     if (!lesson) return NextResponse.json({ error: 'الدرس غير موجود' }, { status: 404 })
 
-    // A student can open a lesson only when it belongs to the student's grade
-    // and the student is enrolled in that course. The old ContentPurchase /
-    // StudentLessonAccess tables are not part of the current Prisma schema.
     if (!user.student.gradeId || lesson.module.course.gradeId !== user.student.gradeId) {
       return NextResponse.json({ error: 'هذا الدرس غير متاح لصفك' }, { status: 403 })
     }
@@ -43,61 +43,44 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
       )
     }
 
-    const orderedModules = await db.courseModule.findMany({
-      where: { courseId: lesson.module.courseId },
-      orderBy: { order: 'asc' },
-      include: {
-        lessons: {
-          orderBy: { order: 'asc' },
-          include: { assignments: { select: { id: true } } },
-        },
-      },
+    const progress = await db.studentProgress.findUnique({
+      where: { studentId_lessonId: { studentId: user.student.id, lessonId: id } },
     })
 
-    const orderedLessons = orderedModules.flatMap((m) => m.lessons)
-    const index = orderedLessons.findIndex((l) => l.id === lesson.id)
+    // Assignments are optional for opening a lesson. Read them separately so
+    // an assignment/submission data problem cannot break the video itself.
+    let assignments: any[] = []
+    try {
+      assignments = await db.assignment.findMany({
+        where: { lessonId: id },
+        orderBy: { dueAt: 'asc' },
+      })
+    } catch (error) {
+      console.error('STUDENT_LESSON_ASSIGNMENTS_READ_ERROR', error)
+    }
 
-    if (index > 0) {
-      const previousAssignmentIds = orderedLessons[index - 1].assignments.map((a) => a.id)
-      if (previousAssignmentIds.length) {
-        const solved = await db.assignmentSubmission.count({
+    const submissionMap = new Map<string, any>()
+    if (assignments.length) {
+      try {
+        const submissions = await db.assignmentSubmission.findMany({
           where: {
             studentId: user.student.id,
-            assignmentId: { in: previousAssignmentIds },
-            submittedAt: { not: null },
+            assignmentId: { in: assignments.map((a) => a.id) },
+          },
+          select: {
+            assignmentId: true,
+            submittedAt: true,
+            score: true,
+            feedback: true,
+            fileUrl: true,
           },
         })
-        if (solved < previousAssignmentIds.length) {
-          return NextResponse.json(
-            { error: 'لازم تحل واجب الدرس السابق قبل فتح هذا الدرس.' },
-            { status: 403 },
-          )
-        }
+        for (const submission of submissions) submissionMap.set(submission.assignmentId, submission)
+      } catch (error) {
+        console.error('STUDENT_LESSON_SUBMISSIONS_READ_ERROR', error)
       }
     }
 
-    const [progress, submissions] = await Promise.all([
-      db.studentProgress.findUnique({
-        where: { studentId_lessonId: { studentId: user.student.id, lessonId: id } },
-      }),
-      lesson.assignments.length
-        ? db.assignmentSubmission.findMany({
-            where: {
-              studentId: user.student.id,
-              assignmentId: { in: lesson.assignments.map((a) => a.id) },
-            },
-            select: {
-              assignmentId: true,
-              submittedAt: true,
-              score: true,
-              feedback: true,
-              fileUrl: true,
-            },
-          })
-        : Promise.resolve([]),
-    ])
-
-    const submissionMap = new Map(submissions.map((s) => [s.assignmentId, s]))
     const videoId = lesson.video?.isPublished
       ? lesson.video.providerAssetId || lesson.video.youtubeUrl
       : null
@@ -112,7 +95,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
             ? { provider: lesson.video?.provider || 'YOUTUBE', id: videoId }
             : null,
           resources: lesson.resources,
-          assignments: lesson.assignments.map((a) => ({
+          assignments: assignments.map((a) => ({
             id: a.id,
             title: a.title,
             description: a.description,
