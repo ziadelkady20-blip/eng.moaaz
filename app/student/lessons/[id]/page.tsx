@@ -5,13 +5,19 @@ import {useEffect,useState} from 'react'
 import Link from 'next/link'
 import {ArrowRight,CheckCircle2,ClipboardCheck,FileText,LockKeyhole,PlayCircle,Send} from 'lucide-react'
 
+async function readJsonResponse(response: Response) {
+ const text = await response.text()
+ if (!text.trim()) throw new Error(`تعذر تحميل الدرس (HTTP ${response.status})`)
+ try { return JSON.parse(text) } catch { throw new Error(`تعذر تحميل الدرس (HTTP ${response.status})`) }
+}
+
 export default function Lesson({params}:{params:Promise<{id:string}>}){
  const [data,setData]=useState<any>(null),[error,setError]=useState(''),[saving,setSaving]=useState(false),[done,setDone]=useState(false),[submitting,setSubmitting]=useState(''),[links,setLinks]=useState<Record<string,string>>({})
  async function load(){
   try{
    const p=await params
-   const r=await fetch('/api/student/lessons/'+p.id+'?ts='+Date.now(),{cache:'no-store'})
-   const d=await r.json();if(!r.ok)throw new Error(d.error)
+   const r=await fetch('/api/student/lessons/'+encodeURIComponent(p.id)+'?ts='+Date.now(),{cache:'no-store'})
+   const d=await readJsonResponse(r);if(!r.ok)throw new Error(d.error||'تعذر تحميل الدرس')
    setData(d);setDone(!!d.lesson.progress.completed)
    const next:Record<string,string>={}
    ;(d.lesson.assignments||[]).forEach((a:any)=>{next[a.id]=a.submission?.fileUrl||''})
@@ -22,18 +28,18 @@ export default function Lesson({params}:{params:Promise<{id:string}>}){
  async function complete(){
   if(!data)return
   setSaving(true)
-  try{const r=await fetch('/api/student/progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lessonId:data.lesson.id,watchedPct:100,lastPositionSec:data.lesson.progress.lastPositionSec,completed:true})});if(r.ok){setDone(true);setData((x:any)=>({...x,lesson:{...x.lesson,progress:{...x.lesson.progress,watchedPct:100,completed:true}}}))}}finally{setSaving(false)}
+  try{const r=await fetch('/api/student/progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lessonId:data.lesson.id,watchedPct:100,lastPositionSec:data.lesson.progress.lastPositionSec,completed:true})});if(r.ok){setDone(true);setData((x:any)=>({...x,lesson:{...x.lesson,progress:{...x.lesson.progress,watchedPct:100,completed:true}}))}}finally{setSaving(false)}
  }
  async function submitAssignment(id:string){
   setSubmitting(id);setError('')
   try{
-   const r=await fetch('/api/assignments/'+id+'/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fileUrl:links[id]||''})})
-   const d=await r.json();if(!r.ok)throw Error(d.error)
+   const r=await fetch('/api/assignments/'+encodeURIComponent(id)+'/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fileUrl:links[id]||''})})
+   const d=await readJsonResponse(r);if(!r.ok)throw Error(d.error||'تعذر تسليم الواجب')
    setData((x:any)=>({...x,lesson:{...x.lesson,assignments:x.lesson.assignments.map((a:any)=>a.id===id?{...a,submission:d.submission}:a)}}))
   }catch(e:any){setError(e.message||'تعذر تسليم الواجب')}finally{setSubmitting('')}
  }
  return <DashboardShell title="الدرس"><div className="mx-auto w-full max-w-[1040px] space-y-5 pb-10">
-  <Link href="/student/courses" className="inline-flex items-center gap-2 text-sm font-black text-[#6d2fa3]"><ArrowRight size={17}/> الكورسات</Link>
+  <Link href="/student/courses" className="inline-flex items-center gap-2 text-sm font-black text-[var(--primary)]"><ArrowRight size={17}/> الكورسات</Link>
   {error?<div className="rounded-[24px] border border-red-200 bg-red-50 px-6 py-12 text-center"><LockKeyhole className="mx-auto text-red-500" size={42}/><h1 className="mt-4 text-xl font-black">المحتوى غير متاح</h1><p className="mx-auto mt-2 max-w-lg text-sm leading-7 text-red-700">{error}</p></div>
   :!data?<div className="h-96 rounded-[28px] bg-gray-100 animate-pulse"/>
   :<><header className="rounded-[24px] border border-[#eee8f4] bg-white px-6 py-5 shadow-[0_10px_30px_rgba(42,24,65,.06)]"><div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"><div><div className="text-xs font-black text-[var(--primary)]">{data.lesson.course}</div><h1 className="mt-1 text-2xl font-black md:text-3xl">{data.lesson.title}</h1></div><div className="w-full md:w-56"><div className="flex justify-between text-xs font-bold"><span>التقدم</span><span>{Math.round(data.lesson.progress.watchedPct)}%</span></div><div className="mt-2 h-2 overflow-hidden rounded-full bg-[#eeeaf4]"><div className="h-full rounded-full bg-[var(--primary)]" style={{width:data.lesson.progress.watchedPct+'%'}}/></div></div></div></header>
