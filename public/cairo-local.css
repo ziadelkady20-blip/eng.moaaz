@@ -1,0 +1,24 @@
+/* Cairo Regular — bundled locally to avoid external Google Fonts/CSP/404 issues. */
+@font-face {
+  font-family: 'MoaazCairoLocal';
+  src: url("data:font/ttf;base64,AA==") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+:root {
+  --platform-font: 'MoaazCairoLocal', 'Cairo', Arial, sans-serif;
+}
+
+html,
+body,
+body *,
+button,
+input,
+textarea,
+select,
+option,
+::placeholder {
+  font-family: var(--platform-font) !important;
+}
