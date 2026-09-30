@@ -15,6 +15,8 @@ const features=[
   {icon:Users,title:'منصة كاملة مع الباشمهندس معاذ',text:'الكورسات والدروس والامتحانات والواجبات كلها في مكان واحد.'},
 ]
 
+const HERO_IMAGE = 'https://raw.githubusercontent.com/ziadelkady20-blip/eng.moaaz/main/app/hero.png/%D8%AF%D9%8A%D8%B2%D8%A7%D9%8A%D9%86%20%D8%AA%D8%B1%D8%AD%D9%8A%D8%A8%20-%20%D9%84%D9%84%D9%85%D9%86%D8%B5%D8%A9.png'
+
 export default function Home(){
  return <main className="landing-page" style={{background:'#f8f7f2',color:'#17243a'}}>
   <section className="relative overflow-hidden" style={{background:'radial-gradient(circle at 15% 35%,#fff0d8 0,transparent 32%),linear-gradient(180deg,#fffdf8 0%,#f8f7f2 100%)'}}>
@@ -36,7 +38,7 @@ export default function Home(){
     </div>
     <div className="relative flex min-h-[590px] items-center justify-center lg:justify-start">
       <div className="absolute h-[500px] w-[500px] rounded-full bg-[#fff0d8]"/>
-      <img src="/api/hero-programming" alt="الباشمهندس معاذ - شرح البرمجة" className="relative z-10 h-[590px] w-[590px] max-w-full object-contain drop-shadow-[0_28px_45px_rgba(23,36,58,.15)]"/>
+      <img src={HERO_IMAGE} alt="الباشمهندس معاذ - شرح البرمجة" className="relative z-10 h-[590px] w-[590px] max-w-full object-contain drop-shadow-[0_28px_45px_rgba(23,36,58,.15)]" />
       <div className="absolute right-2 top-24 z-20 rounded-2xl border border-white bg-white/95 p-4 shadow-xl"><GraduationCap className="text-[#ed7b0b]" size={30}/><b className="mt-1 block text-xs text-[#17243a]">شرح منظم</b></div>
       <div className="absolute bottom-20 left-0 z-20 rounded-2xl border border-white bg-white/95 p-4 shadow-xl"><CheckCircle2 className="text-[#0aa37a]" size={30}/><b className="mt-1 block text-xs text-[#17243a]">تدريب واختبارات</b></div>
     </div>
