@@ -2,9 +2,9 @@
 import {ReactNode,useEffect,useState} from 'react'
 import Link from 'next/link'
 import {usePathname,useRouter} from 'next/navigation'
-import {LayoutDashboard,BookOpen,Wallet,Users,Settings,ShieldCheck,Globe,LogOut,Menu,X,ChevronLeft} from 'lucide-react'
+import {LayoutDashboard,BookOpen,Wallet,Users,Settings,ShieldCheck,Globe,LogOut,Menu,X,ChevronLeft,ClipboardCheck} from 'lucide-react'
 
-const items=[['الرئيسية','/admin',LayoutDashboard],['الكورسات والفيديوهات','/admin/courses',BookOpen],['المدفوعات والحجوزات','/admin/payments',Wallet],['محفظة الطلاب','/admin/wallet',Wallet],['المستخدمون','/admin/users',Users],['الإعدادات','/admin/settings',Settings]] as const
+const items=[['الرئيسية','/admin',LayoutDashboard],['الكورسات والفيديوهات','/admin/courses',BookOpen],['الواجبات وملفات الـPDF','/admin/assignments',ClipboardCheck],['المدفوعات والحجوزات','/admin/payments',Wallet],['محفظة الطلاب','/admin/wallet',Wallet],['المستخدمون','/admin/users',Users],['الإعدادات','/admin/settings',Settings]] as const
 
 export default function AdminShell({children}:{children:ReactNode}){
  const [open,setOpen]=useState(false)
