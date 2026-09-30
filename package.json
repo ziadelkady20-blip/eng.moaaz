@@ -1,7 +1,7 @@
 {
   "name": "taallum-platform",
   "private": true,
-  "version": "0.15.1",
+  "version": "0.15.2",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.16.0",
+    "@vercel/blob": "^2.6.1",
     "googleapis": "^144.0.0",
     "lucide-react": "^0.468.0",
     "next": "^15.5.0",
