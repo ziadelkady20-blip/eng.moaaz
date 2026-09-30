@@ -17,18 +17,27 @@ export default function Lesson({params}:{params:Promise<{id:string}>}){
   try{
    const p=await params
    const r=await fetch('/api/student/lessons/'+encodeURIComponent(p.id)+'?ts='+Date.now(),{cache:'no-store'})
-   const d=await readJsonResponse(r);if(!r.ok)throw new Error(d.error||'تعذر تحميل الدرس')
-   setData(d);setDone(!!d.lesson.progress.completed)
+   const d=await readJsonResponse(r)
+   if(!r.ok)throw new Error(d.error||'تعذر تحميل الدرس')
+   setData(d)
+   setDone(!!d.lesson.progress.completed)
    const next:Record<string,string>={}
    ;(d.lesson.assignments||[]).forEach((a:any)=>{next[a.id]=a.submission?.fileUrl||''})
-   setLinks(next);setError('')
+   setLinks(next)
+   setError('')
   }catch(e:any){setError(e.message||'تعذر تحميل الدرس')}
  }
  useEffect(()=>{load()},[params])
  async function complete(){
   if(!data)return
   setSaving(true)
-  try{const r=await fetch('/api/student/progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lessonId:data.lesson.id,watchedPct:100,lastPositionSec:data.lesson.progress.lastPositionSec,completed:true})});if(r.ok){setDone(true);setData((x:any)=>({...x,lesson:{...x.lesson,progress:{...x.lesson.progress,watchedPct:100,completed:true}}))}}finally{setSaving(false)}
+  try{
+   const r=await fetch('/api/student/progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lessonId:data.lesson.id,watchedPct:100,lastPositionSec:data.lesson.progress.lastPositionSec,completed:true})})
+   if(r.ok){
+    setDone(true)
+    setData((x:any)=>({...x,lesson:{...x.lesson,progress:{...x.lesson.progress,watchedPct:100,completed:true}}}))
+   }
+  }finally{setSaving(false)}
  }
  async function submitAssignment(id:string){
   setSubmitting(id);setError('')
