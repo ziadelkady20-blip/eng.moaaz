@@ -3,6 +3,8 @@ import { db } from '@/lib/db'
 import { requireRole } from '@/lib/auth'
 import { z } from 'zod'
 
+const FILE_MARKER = '\n\n[ASSIGNMENT_PDF_URL]:'
+
 const schema = z.object({
   lessonId: z.string().min(1),
   title: z.string().trim().min(2).max(200),
@@ -10,6 +12,18 @@ const schema = z.object({
   dueAt: z.coerce.date(),
   fileUrl: z.string().url().optional().or(z.literal('')),
 })
+
+function packDescription(description?: string | null, fileUrl?: string | null) {
+  const clean = (description || '').split(FILE_MARKER)[0].trim()
+  return fileUrl ? `${clean}${FILE_MARKER}${fileUrl}` : (clean || null)
+}
+
+export function unpackDescription(description?: string | null) {
+  const raw = description || ''
+  const index = raw.indexOf(FILE_MARKER)
+  if (index === -1) return { description: raw, fileUrl: null as string | null }
+  return { description: raw.slice(0, index).trim(), fileUrl: raw.slice(index + FILE_MARKER.length).trim() || null }
+}
 
 async function ownedPdf(userId: string, fileUrl?: string) {
   if (!fileUrl) return null
@@ -32,7 +46,12 @@ export async function GET() {
         },
       },
     })
-    return NextResponse.json({ assignments })
+    return NextResponse.json({
+      assignments: assignments.map((a) => ({
+        ...a,
+        ...unpackDescription(a.description),
+      })),
+    })
   } catch {
     return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
   }
@@ -49,14 +68,13 @@ export async function POST(req: Request) {
     const assignment = await db.assignment.create({
       data: {
         title: data.title,
-        description: data.description || null,
+        description: packDescription(data.description, data.fileUrl),
         dueAt: data.dueAt,
         lessonId: data.lessonId,
         courseId: lesson.module.courseId,
-        ...(data.fileUrl ? { fileUrl: data.fileUrl } : {}),
       },
     })
-    return NextResponse.json({ assignment }, { status: 201 })
+    return NextResponse.json({ assignment: { ...assignment, ...unpackDescription(assignment.description) } }, { status: 201 })
   } catch (e) {
     return NextResponse.json({ error: e instanceof z.ZodError ? 'بيانات الواجب غير مكتملة' : 'تعذر إضافة الواجب' }, { status: 400 })
   }
