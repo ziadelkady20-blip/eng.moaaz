@@ -23,24 +23,11 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
     const { id } = await params
     const user = await db.user.findUnique({
       where: { id },
-      select: {
-        id: true, name: true, phone: true, role: true, createdAt: true, updatedAt: true,
-        student: {
-          select: {
-            id: true, gradeId: true, schoolId: true, governorateId: true, guardianPhone: true, studyType: true,
-            grade: { select: { id: true, name: true } },
-            school: { select: { id: true, name: true } },
-            governorate: { select: { id: true, name: true } },
-            enrollments: { orderBy: { enrolledAt: 'desc' }, select: { enrolledAt: true, course: { select: { id: true, title: true, coverUrl: true, published: true } } } },
-          },
-        },
-      },
+      select: { id: true, name: true, phone: true, role: true, createdAt: true, updatedAt: true, student: { select: { id: true, gradeId: true, schoolId: true, governorateId: true, guardianPhone: true, studyType: true, grade: { select: { id: true, name: true } }, school: { select: { id: true, name: true } }, governorate: { select: { id: true, name: true } }, enrollments: { orderBy: { enrolledAt: 'desc' }, select: { enrolledAt: true, course: { select: { id: true, title: true, coverUrl: true, published: true } } } } } },
     })
     if (!user) return NextResponse.json({ error: 'الحساب غير موجود' }, { status: 404 })
     return NextResponse.json({ user })
-  } catch {
-    return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
-  }
+  } catch { return NextResponse.json({ error: 'غير مصرح' }, { status: 401 }) }
 }
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -49,26 +36,20 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const { id } = await params
     const target = await db.user.findUnique({ where: { id }, include: { student: true } })
     if (!target) return NextResponse.json({ error: 'الحساب غير موجود' }, { status: 404 })
-
     const data = bodySchema.parse(await req.json())
-    const targetIsSuperAdmin = isSuperAdmin(target)
-    if (targetIsSuperAdmin && !isSuperAdmin(actor)) {
-      return NextResponse.json({ error: 'حساب السوبر أدمن محمي' }, { status: 403 })
-    }
-    if (data.role === 'ADMIN' && !isSuperAdmin(actor)) {
-      return NextResponse.json({ error: 'إنشاء أو ترقية حسابات ADMIN متاح للسوبر أدمن فقط' }, { status: 403 })
-    }
+    const actorIsSuperAdmin = isSuperAdmin(actor)
+    if (isSuperAdmin(target) && !actorIsSuperAdmin) return NextResponse.json({ error: 'حساب السوبر أدمن محمي' }, { status: 403 })
+    if (target.role === 'ADMIN' && data.role !== undefined && data.role !== 'ADMIN' && !actorIsSuperAdmin) return NextResponse.json({ error: 'تغيير صلاحية مدير متاح للسوبر أدمن فقط' }, { status: 403 })
+    if (data.role === 'ADMIN' && target.role !== 'ADMIN' && !actorIsSuperAdmin) return NextResponse.json({ error: 'ترقية الحسابات إلى ADMIN متاحة للسوبر أدمن فقط' }, { status: 403 })
     if (data.phone && data.phone !== target.phone) {
       const exists = await db.user.findUnique({ where: { phone: data.phone } })
       if (exists) return NextResponse.json({ error: 'رقم الهاتف مستخدم بالفعل' }, { status: 409 })
     }
-
     const userData: Record<string, unknown> = {}
     if (data.name !== undefined) userData.name = data.name
     if (data.phone !== undefined) userData.phone = data.phone
     if (data.role !== undefined) userData.role = data.role
     if (data.password) userData.passwordHash = hashPassword(data.password)
-
     await db.$transaction(async (tx) => {
       if (Object.keys(userData).length) await tx.user.update({ where: { id }, data: userData })
       if (target.student) {
@@ -81,11 +62,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         if (Object.keys(studentData).length) await tx.student.update({ where: { id: target.student.id }, data: studentData })
       }
     })
-
     return NextResponse.json({ ok: true })
-  } catch (e) {
-    return NextResponse.json({ error: e instanceof z.ZodError ? 'بيانات التعديل غير صحيحة' : 'تعذر تعديل الحساب' }, { status: 400 })
-  }
+  } catch (e) { return NextResponse.json({ error: e instanceof z.ZodError ? 'بيانات التعديل غير صحيحة' : 'تعذر تعديل الحساب' }, { status: 400 }) }
 }
 
 export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -98,7 +76,5 @@ export async function DELETE(_: Request, { params }: { params: Promise<{ id: str
     if (isSuperAdmin(target) && !isSuperAdmin(actor)) return NextResponse.json({ error: 'حساب السوبر أدمن محمي' }, { status: 403 })
     await db.user.delete({ where: { id } })
     return NextResponse.json({ ok: true })
-  } catch {
-    return NextResponse.json({ error: 'تعذر حذف الحساب' }, { status: 400 })
-  }
+  } catch { return NextResponse.json({ error: 'تعذر حذف الحساب' }, { status: 400 }) }
 }
