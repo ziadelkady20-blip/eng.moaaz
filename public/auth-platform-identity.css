@@ -1,0 +1,54 @@
+/* Auth pages: match the current platform identity (cream + navy + orange). */
+.auth-page{background:#fffdf8!important;color:#26334a!important}
+.auth-page:before{background:#fff0d8!important;opacity:.65!important}
+.auth-page .auth-shell{border-color:#e7e2d9!important;box-shadow:0 24px 70px rgba(23,36,58,.12)!important}
+.auth-page .auth-art{background:linear-gradient(145deg,#17243a,#26334a)!important}
+.auth-page .auth-brand span{color:#ffe1b7!important}
+.auth-page .auth-art-copy p{color:#fff0d8!important}
+.auth-page .auth-mini-brand strong{color:#26334a!important}
+.auth-page .auth-back,.auth-page .auth-link{color:#d66e00!important}
+.auth-page .auth-title{color:#17243a!important}
+.auth-page .auth-subtitle{color:#6d7480!important}
+.auth-page .auth-field{color:#26334a!important}
+.auth-page .auth-field input,.auth-page .auth-field select{border-color:#e4dfd6!important;background:#fffdf8!important;color:#26334a!important}
+.auth-page .auth-field input:focus,.auth-page .auth-field select:focus{border-color:#ed7b0b!important;box-shadow:0 0 0 4px rgba(237,123,11,.10)!important;background:#fff!important}
+.auth-page .auth-check{color:#707784!important}
+.auth-page .auth-check input{accent-color:#ed7b0b!important}
+.auth-page .auth-button{background:linear-gradient(135deg,#ed7b0b,#d66e00)!important;box-shadow:0 12px 24px rgba(237,123,11,.20)!important}
+.auth-page .auth-divider{color:#9a968e!important}
+.auth-page .auth-divider:before,.auth-page .auth-divider:after{background:#e7e2d9!important}
+.auth-page .auth-register{border-color:#ed7b0b!important;color:#d66e00!important;background:#fff!important}
+.auth-page .auth-note{color:#8a8f98!important}
+
+.register-page{background:#fffdf8!important;color:#26334a!important}
+.register-page:before{background:radial-gradient(circle,rgba(237,123,11,.13),rgba(237,123,11,0) 68%)!important}
+.register-page:after{background:radial-gradient(circle,rgba(255,192,92,.13),rgba(255,192,92,0) 70%)!important}
+.register-page .register-nav{border-color:#e7e2d9!important;box-shadow:0 12px 35px rgba(23,36,58,.10)!important;background:rgba(255,253,248,.96)!important}
+.register-page .register-brand strong{color:#26334a!important}
+.register-page .register-links a{color:#26334a!important}
+.register-page .register-links a:hover{color:#e97908!important}
+.register-page .nav-pill{border-color:#e4dfd6!important;color:#26334a!important;background:#fff!important}
+.register-page .nav-cta{background:linear-gradient(135deg,#ed7b0b,#d66e00)!important;box-shadow:0 8px 18px rgba(237,123,11,.20)!important}
+.register-page .register-heading h1{color:#17243a!important}
+.register-page .register-heading p{color:#747b85!important}
+.register-page .step-item.active{color:#d66e00!important}
+.register-page .step-item.active .step-dot{background:linear-gradient(135deg,#ed7b0b,#d66e00)!important;box-shadow:0 8px 20px rgba(237,123,11,.22)!important}
+.register-page .step-item.done{color:#ed7b0b!important}
+.register-page .step-item.done .step-dot{background:#fff0d8!important;color:#d66e00!important}
+.register-page .step-dot{background:#f0ede7!important;color:#9a968e!important}
+.register-page .step-line{background:#e4dfd6!important}
+.register-page .register-card{border-color:#e7e2d9!important;box-shadow:0 22px 65px rgba(23,36,58,.09)!important}
+.register-page .field label{color:#26334a!important}
+.register-page .field input,.register-page .field select{border-color:#e4dfd6!important;background:#fffdf8!important;color:#26334a!important}
+.register-page .field input:focus,.register-page .field select:focus{border-color:#ed7b0b!important;box-shadow:0 0 0 4px rgba(237,123,11,.10)!important;background:#fff!important}
+.register-page .choice{border-color:#e4dfd6!important;color:#68717c!important}
+.register-page .choice.selected{border-color:#ed7b0b!important;background:linear-gradient(135deg,#ed7b0b,#d66e00)!important;box-shadow:0 9px 20px rgba(237,123,11,.18)!important}
+.register-page .photo-box{border-color:#e0c9a8!important;background:#fffaf2!important}
+.register-page .photo-placeholder{background:#fff0d8!important;color:#ed7b0b!important}
+.register-page .register-actions{border-top-color:#e7e2d9!important}
+.register-page .btn-primary{background:linear-gradient(135deg,#ed7b0b,#d66e00)!important;box-shadow:0 12px 24px rgba(237,123,11,.18)!important}
+.register-page .btn-secondary{border-color:#e4dfd6!important;color:#26334a!important;background:#fff!important}
+.register-page .review{border-color:#e7e2d9!important}
+.register-page .review-row{border-bottom-color:#eee9e1!important}
+.register-page .review-row strong{color:#26334a!important}
+.register-page .register-footer{color:#8a8f98!important}
