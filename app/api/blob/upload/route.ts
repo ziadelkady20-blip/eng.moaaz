@@ -53,7 +53,7 @@ export async function POST(request: Request) {
           data: {
             ownerId: payload.ownerId,
             mimeType: blob.contentType || 'application/pdf',
-            size: blob.size,
+            size: 0,
             storageKey: blob.pathname,
             url: blob.url,
           },
