@@ -67,10 +67,6 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
         'SELECT "balance" FROM "Wallet" WHERE "studentId"=$1 LIMIT 1',
         u.student.id,
       ),
-      db.$queryRawUnsafe<any[]>(
-        'SELECT "coverUrl" FROM "Course" WHERE "id"=$1 LIMIT 1',
-        id,
-      ),
     ])
 
     const enrolled = !!enrollment || purchase.length > 0
@@ -119,23 +115,30 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
             id: m.id,
             title: m.title,
             order: m.order,
-            lessons: m.lessons.map((l) => ({
-              id: l.id,
-              title: l.title,
-              order: l.order,
-              hasVideo: !!l.video,
-              locked: lessonLock.get(l.id) ?? true,
-              lockedReason: lessonLock.get(l.id) ? 'أكمل واجب الدرس السابق أولًا' : null,
-              progress: progressMap.get(l.id)?.watchedPct ?? 0,
-              completed: progressMap.get(l.id)?.completed ?? false,
-              assignments: l.assignments.map((a) => ({
-                id: a.id,
-                title: a.title,
-                description: a.description,
-                dueAt: a.dueAt,
-                submitted: submittedSet.has(a.id),
-              })),
-            })),
+            lessons: m.lessons.map((l) => {
+              const locked = lessonLock.get(l.id) ?? true
+              return {
+                id: l.id,
+                title: l.title,
+                order: l.order,
+                hasVideo: !!l.video,
+                locked,
+                lockedReason: locked
+                  ? !enrolled
+                    ? 'ادفع ثمن الكورس لفتح الدرس'
+                    : 'أكمل واجب الدرس السابق أولًا'
+                  : null,
+                progress: progressMap.get(l.id)?.watchedPct ?? 0,
+                completed: progressMap.get(l.id)?.completed ?? false,
+                assignments: l.assignments.map((a) => ({
+                  id: a.id,
+                  title: a.title,
+                  description: a.description,
+                  dueAt: a.dueAt,
+                  submitted: submittedSet.has(a.id),
+                })),
+              }
+            }),
           })),
         },
       },
