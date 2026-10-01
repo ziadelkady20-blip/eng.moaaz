@@ -1,18 +1,12 @@
-/* Platform-wide typography override: keep every page and dashboard on the same Arabic font. */
+/* Platform-wide typography: Cairo is bundled by next/font/google in app/layout.tsx. */
 html,
 body,
-body * {
-  font-family: 'Cairo', 'MoaazCairo', Arial, sans-serif !important;
-}
-
+body *,
 button,
 input,
 textarea,
 select,
-option {
-  font-family: 'Cairo', 'MoaazCairo', Arial, sans-serif !important;
-}
-
+option,
 ::placeholder {
-  font-family: 'Cairo', 'MoaazCairo', Arial, sans-serif !important;
+  font-family: var(--font-cairo), Arial, sans-serif !important;
 }
