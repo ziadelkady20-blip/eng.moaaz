@@ -1,11 +1,19 @@
 import './globals.css'
 import { ReactNode } from 'react'
+import { Cairo } from 'next/font/google'
 import WhatsAppContact from '@/components/WhatsAppContact'
 import ScrollProgress from '@/components/ScrollProgress'
 import MarketingScripts from '@/components/MarketingScripts'
 import SiteContentSync from '@/components/SiteContentSync'
 import HomeAuthHeader from '@/components/HomeAuthHeader'
 import { getSiteSettings } from '@/lib/site-settings'
+
+const cairo = Cairo({
+  subsets: ['arabic', 'latin'],
+  weight: ['400', '500', '600', '700', '800', '900'],
+  display: 'swap',
+  variable: '--font-cairo',
+})
 
 export const dynamic = 'force-dynamic'
 
@@ -31,9 +39,27 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();`
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  return <html lang="ar" dir="rtl"><head>
-    <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" /><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" />
-    <link rel="stylesheet" href="/hero-animations.css" /><link rel="stylesheet" href="/rabie-force.css?v=2" /><link rel="stylesheet" href="/header-pill.css?v=1" /><link rel="stylesheet" href="/stages-filter.css?v=1" /><link rel="stylesheet" href="/scroll-progress.css?v=1" /><link rel="stylesheet" href="/books-package.css?v=1" /><link rel="stylesheet" href="/dark-mode-header-fix.css?v=3" /><link rel="stylesheet" href="/student-loading.css?v=1" /><link rel="stylesheet" href="/brand-logo.css?v=1" /><link rel="stylesheet" href="/interactive-ui.css?v=2" /><link rel="stylesheet" href="/font-override.css?v=3" /><link rel="stylesheet" href="/theme-refresh.css?v=1" /><link rel="stylesheet" href="/platform-identity.css?v=1" /><link rel="stylesheet" href="/auth-platform-identity.css?v=1" />
-    <style>{`@font-face{font-family:'MoaazCairo';src:url('https://fonts.gstatic.com/s/cairo/v28/SLXgc1nY6Hkvalr-ao6O59ZMaA.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}html,body,button,input,textarea,select{font-family:'Cairo','MoaazCairo',Arial,sans-serif!important}`}</style>
-  </head><body style={{fontFamily:"'Cairo', Arial, sans-serif"}}><HomeAuthHeader/><ScrollProgress/>{children}<MarketingScripts/><SiteContentSync/><WhatsAppContact/><script dangerouslySetInnerHTML={{__html:themeScript}}/><script dangerouslySetInnerHTML={{__html:interactionScript}}/></body></html>
+  return <html lang="ar" dir="rtl" className={cairo.variable}>
+    <head>
+      <link rel="stylesheet" href="/hero-animations.css" />
+      <link rel="stylesheet" href="/rabie-force.css?v=2" />
+      <link rel="stylesheet" href="/header-pill.css?v=1" />
+      <link rel="stylesheet" href="/stages-filter.css?v=1" />
+      <link rel="stylesheet" href="/scroll-progress.css?v=1" />
+      <link rel="stylesheet" href="/books-package.css?v=1" />
+      <link rel="stylesheet" href="/dark-mode-header-fix.css?v=3" />
+      <link rel="stylesheet" href="/student-loading.css?v=1" />
+      <link rel="stylesheet" href="/brand-logo.css?v=1" />
+      <link rel="stylesheet" href="/interactive-ui.css?v=2" />
+      <link rel="stylesheet" href="/font-override.css?v=4" />
+      <link rel="stylesheet" href="/theme-refresh.css?v=1" />
+      <link rel="stylesheet" href="/platform-identity.css?v=1" />
+      <link rel="stylesheet" href="/auth-platform-identity.css?v=1" />
+    </head>
+    <body className={cairo.className}>
+      <HomeAuthHeader/><ScrollProgress/>{children}<MarketingScripts/><SiteContentSync/><WhatsAppContact/>
+      <script dangerouslySetInnerHTML={{__html:themeScript}}/>
+      <script dangerouslySetInnerHTML={{__html:interactionScript}}/>
+    </body>
+  </html>
 }
