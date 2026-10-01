@@ -78,22 +78,6 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
       (n, m) => n + m.lessons.filter((l) => progressMap.get(l.id)?.completed).length,
       0,
     )
-    const orderedLessons = course.modules.flatMap((m) => m.lessons)
-    const lessonLock = new Map<string, boolean>()
-    orderedLessons.forEach((lesson, index) => {
-      if (!enrolled) {
-        lessonLock.set(lesson.id, true)
-        return
-      }
-      if (index === 0) {
-        lessonLock.set(lesson.id, false)
-        return
-      }
-      const previous = orderedLessons[index - 1]
-      const previousAssignments = previous.assignments
-      const previousSolved = previousAssignments.length === 0 || previousAssignments.every((a) => submittedSet.has(a.id))
-      lessonLock.set(lesson.id, !previousSolved)
-    })
 
     return NextResponse.json(
       {
@@ -116,18 +100,14 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
             title: m.title,
             order: m.order,
             lessons: m.lessons.map((l) => {
-              const locked = lessonLock.get(l.id) ?? true
+              const locked = !enrolled
               return {
                 id: l.id,
                 title: l.title,
                 order: l.order,
                 hasVideo: !!l.video,
                 locked,
-                lockedReason: locked
-                  ? !enrolled
-                    ? 'ادفع ثمن الكورس لفتح الدرس'
-                    : 'أكمل واجب الدرس السابق أولًا'
-                  : null,
+                lockedReason: locked ? 'ادفع ثمن الكورس لفتح الدرس' : null,
                 progress: progressMap.get(l.id)?.watchedPct ?? 0,
                 completed: progressMap.get(l.id)?.completed ?? false,
                 assignments: l.assignments.map((a) => ({
